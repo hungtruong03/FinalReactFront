@@ -23,7 +23,7 @@ import { useDispatch } from "react-redux";
 import { login } from '../store/authSlice';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -174,7 +174,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 severity: 'success',
             });
 
-            // navigate('/');
+            navigate('/');
         } catch (error) {
             console.error('Login failed:', error);
             setSnackbar({

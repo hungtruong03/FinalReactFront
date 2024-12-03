@@ -20,7 +20,7 @@ const pages = [
     { name: 'Log in', path: '/login' },
     { name: 'Register', path: '/register' },
 ];
-const settings = ['Profile', 'Logout'];
+// const settings = ['Profile', 'Logout'];
 
 function ResponsiveAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
