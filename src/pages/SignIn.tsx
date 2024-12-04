@@ -215,7 +215,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             storage.setItem('authData', JSON.stringify({ accessToken, refreshToken }));
 
             // Redirect user after successful login
-            window.location.href = '/';
+            navigate('/');
         } catch (error: any) {
             console.error('Google login failed:', error);
             setSnackbar({

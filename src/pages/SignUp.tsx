@@ -12,7 +12,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from './theme/AppTheme';
-import { GoogleIcon } from '../components/CustomIcons';
+// import { GoogleIcon } from '../components/CustomIcons';
 import Navbar from '../components/Navbar';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
@@ -210,7 +210,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             );
 
             // Redirect user after successful login
-            window.location.href = '/';
+            navigate('/');
         } catch (error: any) {
             console.error('Google login failed:', error);
             setSnackbar({
