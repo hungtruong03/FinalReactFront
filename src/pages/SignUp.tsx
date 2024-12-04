@@ -73,6 +73,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
     const [usernameError, setUsernameError] = React.useState(false);
     const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -146,6 +147,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
             password: data.get('password'),
         };
 
+        setLoading(true);
+
         try {
             const response = await fetch('https://final-nest-back.vercel.app/user/register', {
                 method: 'POST',
@@ -160,6 +163,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                     message: errorData.message || 'Registration failed.',
                     severity: 'error',
                 });
+                setLoading(false);
                 return;
             }
 
@@ -180,6 +184,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 message: 'An unexpected error occurred. Please try again later.',
                 severity: 'error',
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -314,8 +320,9 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                                 fullWidth
                                 variant="contained"
                                 onClick={validateInputs}
+                                disabled={loading}
                             >
-                                Sign up
+                                {loading ? 'Loading...' : 'Sign up'}
                             </Button>
                         </Box>
                         <Divider>

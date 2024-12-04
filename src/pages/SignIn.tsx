@@ -74,6 +74,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
     const [rememberMe, setRememberMe] = React.useState(false);
     const [open, setOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -130,6 +131,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             password: data.get('password'),
         };
 
+        setLoading(true);
+
         try {
             const response = await fetch('https://final-nest-back.vercel.app/user/login', {
                 method: 'POST',
@@ -144,6 +147,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                     message: errorData.message || 'Invalid email or password.',
                     severity: 'error',
                 });
+                setLoading(false);
                 return;
             }
 
@@ -182,6 +186,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 message: 'An unexpected error occurred. Please try again later.',
                 severity: 'error',
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -309,8 +315,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                                 fullWidth
                                 variant="contained"
                                 onClick={validateInputs}
+                                disabled={loading}
                             >
-                                Sign in
+                                {loading ? 'Loading...' : 'Sign in'}
                             </Button>
                             <Link
                                 component="button"
