@@ -131,7 +131,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         };
 
         try {
-            const response = await fetch('http://localhost:3000/user/login', {
+            const response = await fetch('https://final-nest-back.vercel.app/user/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -196,7 +196,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 return;
             }
 
-            const response = await axios.post('http://localhost:3000/logingg', {
+            const response = await axios.post('https://final-nest-back.vercel.app/logingg', {
                 idToken: credentialResponse.credential,
             });
 

@@ -140,7 +140,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
         };
 
         try {
-            const response = await fetch('http://localhost:3000/user/register', {
+            const response = await fetch('https://final-nest-back.vercel.app/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
