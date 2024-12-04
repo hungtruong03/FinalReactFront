@@ -5,4 +5,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   // base: "/FinalReactFront/",
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://final-nest-back.vercel.app/', 
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''), 
+      },
+    },
+  },
 })
