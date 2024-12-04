@@ -14,7 +14,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/ForgotPassword';
-import { GoogleIcon } from '../components/CustomIcons';
+// import { GoogleIcon } from '../components/CustomIcons';
 import AppTheme from './theme/AppTheme';
 import Navbar from '../components/Navbar';
 import Alert from '@mui/material/Alert';
