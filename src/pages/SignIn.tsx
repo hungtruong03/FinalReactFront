@@ -317,10 +317,11 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                                 onClick={validateInputs}
                                 disabled={loading}
                                 sx={{
-                                    color: loading ? 'text.secondary' : 'inherit',
-                                    bgcolor: loading ? 'grey.300' : 'primary.main',
+                                    bgcolor: loading ? 'grey.400' : 'primary.main',
+                                    color: loading ? 'white' : 'inherit',
                                     '&.Mui-disabled': {
-                                        color: 'text.secondary',
+                                        bgcolor: 'grey.300',
+                                        color: 'white',
                                     },
                                 }}
                             >
