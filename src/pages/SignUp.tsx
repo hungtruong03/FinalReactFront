@@ -321,6 +321,13 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                                 variant="contained"
                                 onClick={validateInputs}
                                 disabled={loading}
+                                sx={{
+                                    color: loading ? 'text.secondary' : 'inherit',
+                                    bgcolor: loading ? 'grey.300' : 'primary.main',
+                                    '&.Mui-disabled': {
+                                        color: 'text.secondary',
+                                    },
+                                }}
                             >
                                 {loading ? 'Loading...' : 'Sign up'}
                             </Button>
