@@ -16,6 +16,11 @@ import { GoogleIcon } from '../components/CustomIcons';
 import Navbar from '../components/Navbar';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import { useDispatch } from "react-redux";
+import { login } from '../store/authSlice';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -68,6 +73,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     const [confirmPasswordErrorMessage, setConfirmPasswordErrorMessage] = React.useState('');
     const [usernameError, setUsernameError] = React.useState(false);
     const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [snackbar, setSnackbar] = React.useState<{ open: boolean; message: string; severity: 'error' | 'info' | 'success' | 'warning' }>({ open: false, message: '', severity: 'info' });
     const { open, message, severity } = snackbar;
@@ -140,7 +147,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
         };
 
         try {
-            const response = await fetch('https://final-nest-back.vercel.app/register', {
+            const response = await fetch('https://final-nest-back.vercel.app/user/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -175,6 +182,51 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 severity: 'error',
             });
         }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse: CredentialResponse): Promise<void> => {
+        try {
+            if (!credentialResponse.credential) {
+                setSnackbar({
+                    open: true,
+                    message: 'Credential is undefined',
+                    severity: 'error',
+                });
+                return;
+            }
+
+            const response = await axios.post('https://final-nest-back.vercel.app/user/logingg', {
+                token: credentialResponse.credential,
+            });
+
+            const { accessToken, refreshToken } = response.data;
+
+            // Dispatch tokens to Redux
+            dispatch(
+                login({
+                    accessToken,
+                    refreshToken,
+                })
+            );
+
+            // Redirect user after successful login
+            window.location.href = '/';
+        } catch (error: any) {
+            console.error('Google login failed:', error);
+            setSnackbar({
+                open: true,
+                message: error.response?.data?.message || 'Google login failed.',
+                severity: 'error',
+            });
+        }
+    };
+
+    const handleGoogleError = () => {
+        setSnackbar({
+            open: true,
+            message: 'Google login was unsuccessful. Please try again.',
+            severity: 'error',
+        });
     };
 
     return (
@@ -270,15 +322,11 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                         <Divider>
                             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
                         </Divider>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={() => alert('Sign up with Google')}
-                                startIcon={<GoogleIcon />}
-                            >
-                                Sign up with Google
-                            </Button>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
+                            <GoogleLogin
+                                onSuccess={handleGoogleSuccess}
+                                onError={handleGoogleError}
+                            />
                             <Typography sx={{ textAlign: 'center' }}>
                                 Already have an account?{' '}
                                 <Link

@@ -196,8 +196,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 return;
             }
 
-            const response = await axios.post('https://final-nest-back.vercel.app/logingg', {
-                idToken: credentialResponse.credential,
+            const response = await axios.post('https://final-nest-back.vercel.app/user/logingg', {
+                token: credentialResponse.credential,
             });
 
             const { accessToken, refreshToken } = response.data;
@@ -323,15 +323,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                             </Link>
                         </Box>
                         <Divider>or</Divider>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={() => alert('Sign in with Google')}
-                                startIcon={<GoogleIcon />}
-                            >
-                                Sign in with Google
-                            </Button>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
                             <GoogleLogin
                                 onSuccess={handleGoogleSuccess}
                                 onError={handleGoogleError}
