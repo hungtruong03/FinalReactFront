@@ -192,6 +192,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     };
 
     const handleGoogleSuccess = async (credentialResponse: CredentialResponse): Promise<void> => {
+        setLoading(true);
+
         try {
             if (!credentialResponse.credential) {
                 setSnackbar({
@@ -199,6 +201,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                     message: 'Credential is undefined',
                     severity: 'error',
                 });
+                setLoading(false);
                 return;
             }
 
@@ -229,6 +232,8 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 message: error.response?.data?.message || 'Google login failed.',
                 severity: 'error',
             });
+        } finally {
+            setLoading(false);
         }
     };
 
