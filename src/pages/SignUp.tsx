@@ -322,8 +322,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                                 onClick={validateInputs}
                                 disabled={loading}
                                 sx={{
-                                    bgcolor: loading ? 'grey.400' : 'primary.main',
-                                    color: loading ? 'white' : 'inherit',
+                                    // bgcolor: loading ? 'grey.400' : 'primary.main',
+                                    // color: loading ? 'white' : 'inherit',
                                     '&.Mui-disabled': {
                                         bgcolor: 'grey.300',
                                         color: 'white',
