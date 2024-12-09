@@ -7,7 +7,7 @@ const Home: React.FC = () => {
     const location = useLocation();
     const message = location.state?.message;
     const navigate = useNavigate();
-
+    const [query, setQuery] = useState('');
     const [movies, setMovies] = useState<any[]>([]);
     const [timeframe, setTimeframe] = useState<"day" | "week">("day");
 
@@ -42,18 +42,45 @@ const Home: React.FC = () => {
             console.error("Invalid movie ID");
         }
     }
-
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (query) {
+            console.log(query);
+            navigate(`/search/${query}`); 
+        } else {
+            console.error("Error");
+        }
+    }
     return (
         <div className="">
-            <Navbar />
-            <div className="flex-grow flex items-center justify-center bg-[url('https://i.pinimg.com/originals/07/21/1b/07211b078ab5e9f537a3daeccef72279.jpg')] bg-cover bg-center bg-no-repeat min-h-80 flex flex-col text-white">
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold">Welcome to the Homepage</h1>
+            <div className="header bg-gray-900 fixed w-full top-0 z-50">
+                <Navbar />
+            </div>
+            <div className="h-[64px]">
+            </div>
+            <div className="pt-4 flex-grow flex items-center justify-center bg-[url('https://i.pinimg.com/originals/07/21/1b/07211b078ab5e9f537a3daeccef72279.jpg')] bg-cover bg-center bg-no-repeat min-h-80 flex flex-col text-white">
+                <div className="text-center w-full">
+                    <h1 className="text-4xl font-bold mb-6">Welcome to the Homepage</h1>
                     {message && (
                         <p className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg inline-block">
                             {message}
                         </p>
                     )}
+                    <form onSubmit={handleSearch} className="w-full mb-6">
+                        <input
+                            type="text"
+                            placeholder="Search for a movies"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="p-3 ps-6 w-[50%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
+                        />
+                        <button
+                            type="submit"
+                            className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-bold"
+                        >
+                            Search
+                        </button>
+                    </form>
                 </div>
             </div>
             <div className="p-4">
@@ -90,12 +117,12 @@ const Home: React.FC = () => {
                             };
 
                             return (
-                                <div key={movie.id} className="w-[120px] bg-gray-800 text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer" onClick={() => handleGoToDetail(movie.id)}>
+                                <div key={movie.id} className="w-[200px] bg-gray-800 text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer" onClick={() => handleGoToDetail(movie.id)}>
                                     <div className="relative">
                                         <img
                                             src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
                                             alt={movie.title}
-                                            className="rounded-md w-[100px] h-[150px] object-cover mb-4 mx-auto"
+                                            className="rounded-md w-[1800px] h-[200px] object-cover mb-4 mx-auto"
                                         />
                                         <div className={`absolute -top-3 -left-3 text-xs rounded-full w-10 h-10 flex items-center justify-center border-4 border-gray-600 bg-gray-900 ${getColor()}`}>
                                             {votePercentage}{votePercentage === "NR" ? "" : "%"}

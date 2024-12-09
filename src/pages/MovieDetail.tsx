@@ -50,7 +50,11 @@ const MovieDetail: React.FC = () => {
 
     return (
         <div className="bg-gray-900 text-white min-h-screen">
-            <Navbar />
+            <div className="header bg-gray-900 fixed w-full top-0 z-50">
+                <Navbar />
+            </div>
+            <div className="h-[80px]">
+            </div>
             <div className="relative">
                 <div
                     className="absolute inset-0 bg-cover bg-center"
