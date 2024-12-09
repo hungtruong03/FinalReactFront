@@ -56,7 +56,7 @@ const Home: React.FC = () => {
             <div className="header bg-gray-900 fixed w-full top-0 z-50">
                 <Navbar />
             </div>
-            <div className="h-[64px]">
+            <div className="w-[64px]">
             </div>
             <div className="pt-4 flex-grow flex items-center justify-center bg-[url('https://i.pinimg.com/originals/07/21/1b/07211b078ab5e9f537a3daeccef72279.jpg')] bg-cover bg-center bg-no-repeat min-h-80 flex flex-col text-white">
                 <div className="text-center w-full">
@@ -76,7 +76,7 @@ const Home: React.FC = () => {
                         />
                         <button
                             type="submit"
-                            className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-bold"
+                            className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-semibold"
                         >
                             Search
                         </button>
