@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import Navbar from '../components/Navbar';
 
 const Home: React.FC = () => {
     const location = useLocation();
     const message = location.state?.message;
+    const navigate = useNavigate();
 
     const [movies, setMovies] = useState<any[]>([]);
     const [timeframe, setTimeframe] = useState<"day" | "week">("day");
@@ -34,7 +35,12 @@ const Home: React.FC = () => {
     };
 
     const handleGoToDetail = (id: number) => {
-        console.log(id);
+        if (id) {
+            console.log(id);
+            navigate(`/movie/${id}`); // Điều hướng đến trang chi tiết phim
+        } else {
+            console.error("Invalid movie ID");
+        }
     }
 
     return (

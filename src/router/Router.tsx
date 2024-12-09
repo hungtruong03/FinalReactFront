@@ -5,6 +5,7 @@ import Home from "../pages/Home";
 import Login from "../pages/SignIn";
 import Register from "../pages/SignUp";
 import Private from "../pages/Private";
+import MovieDetail from "../pages/MovieDetail";
 
 export default function AppRouter() {
 	return (
@@ -16,6 +17,7 @@ export default function AppRouter() {
 				<Route element={<PrivateRoute />}>
 					<Route path="/private" element={<Private />} />
 				</Route>
+				<Route path="/movie/:id" element={<MovieDetail />} /> {/* Route cho MovieDetail */}
 			</Routes>
 		</Router>
 	);

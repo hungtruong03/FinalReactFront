@@ -1,0 +1,40 @@
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.bg-cover {
+    background-size: cover;
+}
+
+.bg-center {
+    background-position: center;
+}
+
+.rating-circle {
+    position: relative;
+    width: 64px; /* Kích thước vòng tròn */
+    height: 64px; /* Kích thước vòng tròn */
+    border-radius: 50%;
+    border: 4px solid #4caf50; /* Màu viền */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1c1c1c; /* Màu nền vòng tròn */
+}
+
+.rating-circle span {
+    position: absolute;
+    font-size: 1.2rem; /* Kích thước chữ */
+    color: white; /* Màu chữ */
+}
