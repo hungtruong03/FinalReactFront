@@ -102,7 +102,7 @@ const SearchMovies: React.FC = () => {
                             placeholder="Search for a movies"
                             value={que}
                             onChange={(e) => setQuery(e.target.value)}
-                            className="p-3 ps-6 w-[70%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
+                            className="p-3 ps-6 md:w-[70%] w-[30%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
                         />
                         <button
                             type="submit"
