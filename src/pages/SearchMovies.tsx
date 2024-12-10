@@ -8,8 +8,8 @@ const SearchMovies: React.FC = () => {
     const [page, setPage] = useState(1); // Current page
     const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
     const [selectedCategory, setSelectedCategory] = useState<string>('movie'); // Selected category (default to 'movie')
-    const { query } = useParams<{ query: string }>();
-
+    var { query } = useParams<{ query: string }>();
+    var [que,setQuery] = useState('');
     // Function to fetch data for a single category (e.g., movie, tv, person, collection)
     const fetchCategoryData = async (type: string) => {
         try {
@@ -76,7 +76,18 @@ const SearchMovies: React.FC = () => {
     useEffect(() => {
         fetchAllCategories();
     }, [query, selectedCategory, page]);
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
 
+        if (que) {
+            setPage(1); 
+            query=que;
+            fetchAllCategories();
+            
+        } else {
+            console.error("Error");
+        }
+    }
     return (
         <div className="bg-gray-900 text-white min-h-screen">
             <div className="header bg-gray-900 fixed w-full top-0 z-50">
@@ -85,7 +96,22 @@ const SearchMovies: React.FC = () => {
             <div className="h-[64px]">
             </div>
             <div className="container mx-auto p-6 relative">
-                <h1 className="text-2xl font-bold text-yellow-400 mb-4">Search Results for "{query}"</h1>
+                    <form onSubmit={handleSearch} className="w-full mb-6">
+                        <input
+                            type="text"
+                            placeholder="Search for a movies"
+                            value={que}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="p-3 ps-6 w-[80%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
+                        />
+                        <button
+                            type="submit"
+                            className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-semibold"
+                        >
+                            Search
+                        </button>
+                    </form>
+                <h1 className="text-2xl font-bold text-yellow-400 mb-4">Search Results for "{que||query}"</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-12 gap-6">
                     {/* Category Statistics Table */}
                     <div className="md:col-span-3 overflow-x-auto mb-8">
