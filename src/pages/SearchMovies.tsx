@@ -96,14 +96,13 @@ const SearchMovies: React.FC = () => {
             <div className="h-[64px]">
             </div>
             <div className="container mx-auto p-6 relative">
-                <div className="w-full">
                     <form onSubmit={handleSearch} className="mb-6">
                         <input
                             type="text"
                             placeholder="Search for a movies"
                             value={que}
                             onChange={(e) => setQuery(e.target.value)}
-                            className="p-3 ps-6 w-[80%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
+                            className="p-3 ps-6 w-[70%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
                         />
                         <button
                             type="submit"
@@ -112,7 +111,6 @@ const SearchMovies: React.FC = () => {
                             Search
                         </button>
                     </form>
-                </div>
                    
                 <h1 className="text-2xl font-bold text-yellow-400 mb-4">Search Results for "{que||query}"</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-12 gap-6">
