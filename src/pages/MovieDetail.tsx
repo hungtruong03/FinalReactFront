@@ -8,12 +8,14 @@ import 'react-circular-progressbar/dist/styles.css'; // Import CSS của thư vi
 const MovieDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [movie, setMovie] = useState<any>(null);
+    const [credits, setCredits] = useState<any[]>([]); // Mảng diễn viên
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchMovieDetail = async () => {
             try {
-                const response = await fetch(`https://api.themoviedb.org/3/movie/${id}`, {
+                // Fetch thông tin chi tiết phim
+                const movieResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -21,15 +23,32 @@ const MovieDetail: React.FC = () => {
                     },
                 });
 
-                if (!response.ok) {
+                if (!movieResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
 
-                const data = await response.json();
-                setMovie(data);
+                const movieData = await movieResponse.json();
+                console.log(movieData);
+                setMovie(movieData);
+
+                // Fetch danh sách diễn viên
+                const creditsResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}/credits`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
+                    },
+                });
+
+                if (!creditsResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const creditsData = await creditsResponse.json();
+                setCredits(creditsData.cast); // Lưu danh sách diễn viên
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching movie details:', error);
+                console.error('Error fetching movie details or credits:', error);
                 setLoading(false);
             }
         };
@@ -66,7 +85,7 @@ const MovieDetail: React.FC = () => {
                         <img
                             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                             alt={movie.title}
-                            className="rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out" // Thêm hiệu ứng hover
+                            className="rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
                         />
                     </div>
                     {/* Bên phải: Nội dung */}
@@ -79,12 +98,12 @@ const MovieDetail: React.FC = () => {
                             <div className="w-24 h-24 mr-6">
                                 <CircularProgressbar
                                     value={ratingPercentage}
-                                    text={`${ratingPercentage}%`}
+                                    text={`${movie.vote_average} / 10`}
                                     strokeWidth={12}
                                     styles={{
                                         path: { stroke: '#f39c12' },
                                         trail: { stroke: '#444' },
-                                        text: { fill: '#fff', fontSize: '14px', fontWeight: 'bold' },
+                                        text: { fill: '#fff', fontSize: '16px', fontWeight: 'bold' },
                                     }}
                                 />
                             </div>
@@ -95,6 +114,22 @@ const MovieDetail: React.FC = () => {
                         
                         <h2 className="text-2xl mt-6 text-white">Overview</h2>
                         <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
+
+                        {/* Hiển thị danh sách diễn viên */}
+                        <h2 className="text-2xl mt-6 text-white">Cast</h2>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+                            {credits.slice(0, 10).map((actor) => (
+                                <div key={actor.id} className="text-center">
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                                        alt={actor.name}
+                                        className="mx-auto mb-2 shadow-lg rounded-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                                        style={{ width: '120px', height: '150px' }}
+                                    />
+                                    <p className="text-sm text-white">{actor.name}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
