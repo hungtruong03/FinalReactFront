@@ -57,7 +57,7 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" sx={{ backgroundColor: '#000044' }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Typography
@@ -70,7 +70,6 @@ function ResponsiveAppBar() {
                             display: { xs: 'none', md: 'flex' },
                             fontFamily: 'monospace',
                             fontWeight: 700,
-                            letterSpacing: '.3rem',
                             color: 'inherit',
                             textDecoration: 'none',
                         }}
@@ -128,8 +127,7 @@ function ResponsiveAppBar() {
                             flexGrow: 1,
                             fontFamily: 'monospace',
                             fontWeight: 700,
-                            letterSpacing: '.3rem',
-                            color: 'inherit',
+                                color: 'inherit',
                             textDecoration: 'none',
                         }}
                     >

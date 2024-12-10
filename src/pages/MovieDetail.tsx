@@ -69,7 +69,11 @@ const MovieDetail: React.FC = () => {
 
     return (
         <div className="bg-gray-900 text-white min-h-screen">
-            <Navbar />
+            <div className="header bg-gray-900 fixed w-full top-0 z-50">
+                <Navbar />
+            </div>
+            <div className="h-[80px]">
+            </div>
             <div className="relative">
                 <div
                     className="absolute inset-0 bg-cover bg-center"
@@ -81,7 +85,7 @@ const MovieDetail: React.FC = () => {
                 />
                 <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
                     {/* Bên trái: Ảnh poster */}
-                    <div className="md:w-1/2 mb-6 md:mb-0">
+                    <div className="md:w-1/2 mb-6 md:mb-0  flex justify-center items-center">
                         <img
                             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                             alt={movie.title}

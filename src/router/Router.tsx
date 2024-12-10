@@ -6,7 +6,7 @@ import Login from "../pages/SignIn";
 import Register from "../pages/SignUp";
 import Private from "../pages/Private";
 import MovieDetail from "../pages/MovieDetail";
-
+import SearchMovies from "../pages/SearchMovies";
 export default function AppRouter() {
 	return (
 		<Router>
@@ -18,6 +18,7 @@ export default function AppRouter() {
 					<Route path="/private" element={<Private />} />
 				</Route>
 				<Route path="/movie/:id" element={<MovieDetail />} /> {/* Route cho MovieDetail */}
+				<Route path="/search/:query" element={<SearchMovies />} />
 			</Routes>
 		</Router>
 	);
