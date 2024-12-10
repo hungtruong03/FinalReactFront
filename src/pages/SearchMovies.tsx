@@ -96,7 +96,8 @@ const SearchMovies: React.FC = () => {
             <div className="h-[64px]">
             </div>
             <div className="container mx-auto p-6 relative">
-                    <form onSubmit={handleSearch} className="w-full mb-6">
+                <div>
+                <form onSubmit={handleSearch} className="w-full mb-6">
                         <input
                             type="text"
                             placeholder="Search for a movies"
@@ -111,6 +112,8 @@ const SearchMovies: React.FC = () => {
                             Search
                         </button>
                     </form>
+                </div>
+                   
                 <h1 className="text-2xl font-bold text-yellow-400 mb-4">Search Results for "{que||query}"</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-12 gap-6">
                     {/* Category Statistics Table */}
