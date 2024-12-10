@@ -84,7 +84,7 @@ const SearchMovies: React.FC = () => {
             </div>
             <div className="h-[64px]">
             </div>
-            <div className="container mx-auto p-6">
+            <div className="container mx-auto p-6 relative">
                 <h1 className="text-2xl font-bold text-yellow-400 mb-4">Search Results for "{query}"</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-12 gap-6">
                     {/* Category Statistics Table */}
