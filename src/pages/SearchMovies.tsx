@@ -86,7 +86,7 @@ const SearchMovies: React.FC = () => {
             </div>
             <div className="container mx-auto p-6">
                 <h1 className="text-2xl font-bold text-yellow-400 mb-4">Search Results for "{query}"</h1>
-                <div className="grid grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-12 gap-6">
                     {/* Category Statistics Table */}
                     <div className="md:col-span-3 overflow-x-auto mb-8">
                         <table className="table-auto w-full text-left text-gray-300 bg-gray-800 rounded-lg shadow-lg">
