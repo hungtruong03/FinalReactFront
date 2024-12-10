@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import Navbar from '../components/Navbar';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 const Home: React.FC = () => {
     const location = useLocation();
@@ -46,7 +48,7 @@ const Home: React.FC = () => {
         e.preventDefault();
         if (query) {
             console.log(query);
-            navigate(`/search/${query}`); 
+            navigate(`/search/${query}`);
         } else {
             console.error("Error");
         }
@@ -107,13 +109,14 @@ const Home: React.FC = () => {
                 <div className="overflow-x-auto">
                     <div className="flex gap-4">
                         {movies.map((movie) => {
-                            const votePercentage = movie.vote_count === 0 ? "NR" : Math.round(movie.vote_average * 10);
+                            // const votePercentage = movie.vote_count === 0 ? "NR" : Math.round(movie.vote_average * 10);
+                            const ratingPercentage = Math.round(movie.vote_average * 10);
 
                             const getColor = () => {
-                                if (movie.vote_count === 0) return 'text-gray-500';
-                                if (typeof votePercentage === 'number' && votePercentage > 70) return 'text-green-500';
-                                if (typeof votePercentage === 'number' && votePercentage >= 50) return 'text-yellow-500';
-                                return 'text-red-500';
+                                if (movie.vote_count === 0) return '#6c757d'; // Gray
+                                if (ratingPercentage > 70) return '#27ae60'; // Green
+                                if (ratingPercentage >= 50) return '#f1c40f'; // Yellow
+                                return '#e74c3c'; // Red
                             };
 
                             return (
@@ -124,8 +127,22 @@ const Home: React.FC = () => {
                                             alt={movie.title}
                                             className="rounded-md w-[1800px] h-[200px] object-cover mb-4 mx-auto"
                                         />
-                                        <div className={`absolute -top-3 -left-3 text-xs rounded-full w-10 h-10 flex items-center justify-center border-4 border-gray-600 bg-gray-900 ${getColor()}`}>
+                                        {/* <div className={`absolute -top-3 -left-3 text-xs rounded-full w-10 h-10 flex items-center justify-center border-4 border-gray-600 bg-gray-900 ${getColor()}`}>
                                             {votePercentage}{votePercentage === "NR" ? "" : "%"}
+                                        </div> */}
+                                        <div className="absolute -top-2 -left-2 w-10 h-10 bg-[#2d2d2d] rounded-full">
+                                            <CircularProgressbar
+                                                value={movie.vote_count === 0 ? 0 : ratingPercentage}
+                                                text={movie.vote_count === 0 ? "NR" : `${ratingPercentage.toString()}%`}
+                                                strokeWidth={12}
+                                                styles={buildStyles({
+                                                    pathColor: getColor(),
+                                                    backgroundColor: "#2d2d2d",
+                                                    trailColor: '#444',
+                                                    textColor: '#fff',
+                                                    textSize: '32px',
+                                                })}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center">
