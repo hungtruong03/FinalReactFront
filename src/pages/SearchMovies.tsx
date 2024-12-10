@@ -96,8 +96,8 @@ const SearchMovies: React.FC = () => {
             <div className="h-[64px]">
             </div>
             <div className="container mx-auto p-6 relative">
-                <div>
-                <form onSubmit={handleSearch} className="w-full mb-6">
+                <div className="w-full">
+                    <form onSubmit={handleSearch} className="w-full mb-6">
                         <input
                             type="text"
                             placeholder="Search for a movies"
