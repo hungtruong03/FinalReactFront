@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import Navbar from '../components/Navbar';
 import { CircularProgressbar } from 'react-circular-progressbar'; // Import thư viện vòng tròn
 import 'react-circular-progressbar/dist/styles.css'; // Import CSS của thư viện
 

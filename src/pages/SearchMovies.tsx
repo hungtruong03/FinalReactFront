@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
 
 const SearchMovies: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]); // Stores movie results
