@@ -16,7 +16,6 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/ForgotPassword';
 // import { GoogleIcon } from '../components/CustomIcons';
 import AppTheme from './theme/AppTheme';
-import Navbar from '../components/Navbar';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { useDispatch } from "react-redux";
@@ -247,7 +246,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
     return (
         <>
-            <Navbar />
             <AppTheme {...props}>
                 <CssBaseline enableColorScheme />
                 <SignInContainer direction="column" justifyContent="space-between">

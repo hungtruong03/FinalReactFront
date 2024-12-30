@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import Navbar from '../components/Navbar';
@@ -10,6 +11,7 @@ const MovieDetail: React.FC = () => {
     const [movie, setMovie] = useState<any>(null);
     const [credits, setCredits] = useState<any[]>([]); // Mảng diễn viên
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchMovieDetail = async () => {
@@ -64,25 +66,23 @@ const MovieDetail: React.FC = () => {
         return <div>Movie not found</div>;
     }
 
+    const handleGoToCastDetail = (castId: number) => {
+        if (castId) {
+            console.log(castId);
+            navigate(`/person/${castId}`);
+        } else {
+            console.error("Invalid cast ID");
+        }
+    }
+
     // Tính toán phần trăm từ rating
     const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
 
     return (
         <div className="bg-gray-900 text-white min-h-screen">
-            <div className="header bg-gray-900 fixed w-full top-0 z-50">
-                <Navbar />
-            </div>
             <div className="h-[80px]">
             </div>
             <div className="relative">
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                        backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
-                        filter: 'blur(10px)',
-                        zIndex: -1,
-                    }}
-                />
                 <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
                     {/* Bên trái: Ảnh poster */}
                     <div className="md:w-1/2 mb-6 md:mb-0  flex justify-center items-center">
@@ -96,7 +96,7 @@ const MovieDetail: React.FC = () => {
                     <div className="md:w-1/2 md:pl-6">
                         <h1 className="text-4xl font-bold text-yellow-400 mb-3">{movie.title}</h1>
                         <p className="text-lg text-gray-400"><strong>Release Date:</strong> {format(new Date(movie.release_date), 'MMM dd, yyyy')}</p>
-                        
+
                         {/* Hiển thị vòng tròn rating */}
                         <div className="flex items-center mt-4 mb-6">
                             <div className="w-24 h-24 mr-6">
@@ -115,7 +115,7 @@ const MovieDetail: React.FC = () => {
                         </div>
 
                         <p className="text-lg text-gray-400"><strong>Genres:</strong> {movie.genres.map((genre: any) => genre.name).join(', ')}</p>
-                        
+
                         <h2 className="text-2xl mt-6 text-white">Overview</h2>
                         <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
 
@@ -129,6 +129,7 @@ const MovieDetail: React.FC = () => {
                                         alt={actor.name}
                                         className="mx-auto mb-2 shadow-lg rounded-lg hover:scale-105 transition-transform duration-300 ease-in-out"
                                         style={{ width: '120px', height: '150px' }}
+                                        onClick={() => handleGoToCastDetail(actor.id)}
                                     />
                                     <p className="text-sm text-white">{actor.name}</p>
                                 </div>

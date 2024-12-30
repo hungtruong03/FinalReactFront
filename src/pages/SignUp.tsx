@@ -13,7 +13,6 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from './theme/AppTheme';
 // import { GoogleIcon } from '../components/CustomIcons';
-import Navbar from '../components/Navbar';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { useDispatch } from "react-redux";
@@ -241,7 +240,6 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
 
     return (
         <>
-            <Navbar />
             <AppTheme {...props}>
                 <CssBaseline enableColorScheme />
                 {/* <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} /> */}

@@ -8,7 +8,6 @@ const Home: React.FC = () => {
 
     return (
         <div className="bg-[url('https://www.vietnamworks.com/hrinsider/wp-content/uploads/2023/12/hinh-nen-may-tinh-dep-a-41-1.jpg')] bg-cover bg-center bg-no-repeat min-h-screen flex flex-col text-white">
-            <Navbar />
             <div className="flex-grow flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold">This is the private page</h1>

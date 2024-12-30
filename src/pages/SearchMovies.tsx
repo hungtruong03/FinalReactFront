@@ -90,9 +90,6 @@ const SearchMovies: React.FC = () => {
     }
     return (
         <div className="bg-gray-900 text-white min-h-screen">
-            <div className="header bg-gray-900 fixed w-full top-0 z-50">
-                <Navbar />
-            </div>
             <div className="h-[64px]">
             </div>
             <div className="container mx-auto p-6 relative">
