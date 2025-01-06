@@ -28,7 +28,7 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
     setLoading(true);
 
     try {
-      await axios.post('https://final-nest-back.vercel.app/user/request-password-reset', { email });
+      await axios.post('https://final-nest-back.vercel.app/user/requestPasswordReset', { email });
       setMessage({ type: 'success', text: 'An email has been sent to reset your password.' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to send the reset email. Please try again.' });

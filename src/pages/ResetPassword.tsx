@@ -19,7 +19,7 @@ export default function ResetPassword(props: { disableCustomTheme?: boolean }) {
 
     useEffect(() => {
         if (resetCode) {
-            axios.get(`https://final-nest-back.vercel.app/user/verify-reset-code?key=${resetCode}`)
+            axios.get(`https://final-nest-back.vercel.app/user/verifyResetCode?key=${resetCode}`)
                 .then(response => setEmail(response.data.email))
                 .catch(() => setError('Invalid or expired reset code.'));
         }
@@ -39,7 +39,7 @@ export default function ResetPassword(props: { disableCustomTheme?: boolean }) {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://final-nest-back.vercel.app/user/reset-password', {
+            const response = await axios.post('https://final-nest-back.vercel.app/user/resetPassword', {
                 email,
                 newPassword,
                 resetCode,
