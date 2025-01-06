@@ -20,6 +20,7 @@ import { login } from '../store/authSlice';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Modal from '@mui/material/Modal';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -63,6 +64,18 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
     },
 }));
 
+const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
 export default function SignUp(props: { disableCustomTheme?: boolean }) {
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -73,6 +86,9 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     const [usernameError, setUsernameError] = React.useState(false);
     const [usernameErrorMessage, setUsernameErrorMessage] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const [otp, setOtp] = React.useState('');
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const [registrationPayload, setRegistrationPayload] = React.useState<{ username: FormDataEntryValue | null; email: FormDataEntryValue | null; password: FormDataEntryValue | null } | null>(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -134,7 +150,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
         return isValid;
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleRequestOTP = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!validateInputs()) return;
@@ -149,42 +165,64 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
         setLoading(true);
 
         try {
-            const response = await fetch('https://final-nest-back.vercel.app/user/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+            const response = await axios.post('https://final-nest-back.vercel.app/user/requestOTP', {
+                email: payload.email,
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                setSnackbar({
-                    open: true,
-                    message: errorData.message || 'Registration failed.',
-                    severity: 'error',
-                });
-                setLoading(false);
-                return;
+            if (response.status === 200) {
+                setRegistrationPayload(payload);
+                setModalOpen(true);
+            } else {
+                throw new Error('Failed to request OTP.');
             }
-
-            setSnackbar({
-                open: true,
-                message: 'Registration successful, you will be redirect to the login page!',
-                severity: 'success',
-            });
-
-            // Redirect to login page after a delay
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 2000);
         } catch (error) {
-            console.log(error);
             setSnackbar({
                 open: true,
-                message: 'An unexpected error occurred. Please try again later.',
+                message: 'Failed to send OTP. Please try again.',
                 severity: 'error',
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleConfirmOTP = async () => {
+        if (!otp) {
+            setSnackbar({
+                open: true,
+                message: 'Please enter the OTP.',
+                severity: 'warning',
+            });
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await axios.post('https://final-nest-back.vercel.app/user/register', {
+                ...registrationPayload,
+                otp,
+            });
+
+            if (response.status === 200) {
+                setSnackbar({
+                    open: true,
+                    message: 'Registration successful! Redirecting to login...',
+                    severity: 'success',
+                });
+                setTimeout(() => navigate('/login'), 2000);
+            } else {
+                throw new Error('Failed to register.');
+            }
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: 'Registration failed. Please try again.',
+                severity: 'error',
+            });
+        } finally {
+            setLoading(false);
+            setModalOpen(false);
         }
     };
 
@@ -254,7 +292,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                         </Typography>
                         <Box
                             component="form"
-                            onSubmit={handleSubmit}
+                            onSubmit={handleRequestOTP}
                             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                         >
                             <FormControl>
@@ -357,6 +395,28 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                         </Box>
                     </Card>
                 </SignUpContainer>
+                <Modal open={modalOpen} onClose={() => { }}>
+                    <Box sx={modalStyle}>
+                        <Typography variant="h6" component="h2">
+                            Enter OTP
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="OTP"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+                            <Button variant="outlined" onClick={() => setModalOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="contained" onClick={handleConfirmOTP} disabled={loading}>
+                                Confirm
+                            </Button>
+                        </Box>
+                    </Box>
+                </Modal>
                 <Snackbar
                     open={open}
                     autoHideDuration={6000}

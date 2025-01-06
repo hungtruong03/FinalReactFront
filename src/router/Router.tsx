@@ -9,6 +9,7 @@ import Private from "../pages/Private";
 import MovieDetail from "../pages/MovieDetail";
 import CastDetail from "../pages/CastDetail";
 import SearchMovies from "../pages/SearchMovies";
+import ResetPassword from "../pages/ResetPassword";
 export default function AppRouter() {
 	return (
 		<Router>
@@ -23,6 +24,7 @@ export default function AppRouter() {
                     <Route path="/movie/:id" element={<MovieDetail />} /> {/* Route cho MovieDetail */}
 					<Route path="/person/:castId" element={<CastDetail />} />
                     <Route path="/search/:query" element={<SearchMovies />} />
+                    <Route path="/resetpassword" element={<ResetPassword />} />
                 </Routes>
             </MainLayout>
 		</Router>
