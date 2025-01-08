@@ -74,11 +74,10 @@ const MovieDetail: React.FC = () => {
         const fetchMovieDetail = async () => {
             try {
                 // Fetch thông tin chi tiết phim
-                const movieResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}`, {
+                const movieResponse = await fetch(`http://localhost:3000/movies/${id}`, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
+                        'Content-Type': 'application/json'
                     },
                 });
 
@@ -91,11 +90,10 @@ const MovieDetail: React.FC = () => {
                 setMovie(movieData);
 
                 // Fetch danh sách diễn viên
-                const creditsResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}/credits`, {
+                const creditsResponse = await fetch(`http://localhost:3000/movies/${id}/credits`, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
+                        'Content-Type': 'application/json'
                     },
                 });
 
@@ -104,7 +102,8 @@ const MovieDetail: React.FC = () => {
                 }
 
                 const creditsData = await creditsResponse.json();
-                setCredits(creditsData.cast); // Lưu danh sách diễn viên
+                // console.log(creditsData);
+                setCredits(creditsData[0].cast); // Lưu danh sách diễn viên
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching movie details or credits:', error);
