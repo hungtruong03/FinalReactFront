@@ -6,6 +6,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import Modal from 'react-modal';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import axios from 'axios';
 
 Modal.setAppElement('#root');
 
@@ -19,78 +20,44 @@ const Home: React.FC = () => {
     const [popularMovies, setPopularMovies] = useState<any[]>([]);
     const [selectedTrailer, setSelectedTrailer] = useState<any | null>(null);
     const [hoveredTrailer, setHoveredTrailer] = useState('');
+    const [trailersLoading, setTrailersLoading] = useState(false);
     const [timeframe, setTimeframe] = useState<"day" | "week">("day");
 
-    const TMDB_API_KEY = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
-
     const fetchMovies = async () => {
-        const response = await fetch(
-            `https://api.themoviedb.org/3/trending/movie/${timeframe}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${TMDB_API_KEY}`,
-                },
-            }
-        );
-        const data = await response.json();
-        setMovies(data.results);
+        const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/trending/${timeframe}?limit=20`)
+        setMovies(response.data);
     };
 
     const fetchPopularMovies = async () => {
-        const response = await fetch(
-            `https://api.themoviedb.org/3/movie/popular`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${TMDB_API_KEY}`,
-                },
-            }
-        );
-        const data = await response.json();
-        setPopularMovies(data.results);
+        const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/popular?limit=20`)
+        setPopularMovies(response.data);
     };
 
     const fetchLatestTrailers = async () => {
+        setTrailersLoading(true);
+        setHoveredTrailer('');
         try {
-            const discoverResponse = await fetch(
-                `https://api.themoviedb.org/3/movie/upcoming`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${TMDB_API_KEY}`,
-                    },
-                }
-            );
-    
-            const discoverData = await discoverResponse.json();
-            const latestMovies = discoverData.results.slice(0, 4);
-    
-            const trailerPromises = latestMovies.map(async (movie: any) => {
-                const response = await fetch(
-                    `https://api.themoviedb.org/3/movie/${movie.id}/videos`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${TMDB_API_KEY}`,
-                        },
-                    }
-                );
-    
-                const data = await response.json();
-                const trailer = data.results.find((vid: any) => vid.type === 'Trailer' && vid.site === 'YouTube');
+            const upcomingResponse = await axios.get(`https://final-nest-back.vercel.app/homeapi/upcoming?limit=5`)
+
+            const upcomingData = upcomingResponse.data;
+
+            const trailerPromises = upcomingData.map(async (movie: any) => {
+                const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/movie/${movie.id}/trailers`)
+
+                const data = response.data;
+                const trailer = data.find((vid: any) => vid.type === 'Trailer' && vid.site === 'YouTube');
                 return trailer ? { ...trailer, movie } : null;
             });
-    
+
             const resolvedTrailers = (await Promise.all(trailerPromises)).filter(Boolean);
             setTrailers(resolvedTrailers);
             setHoveredTrailer(resolvedTrailers[0]?.movie.backdrop_path);
+            setTrailersLoading(false);
         } catch (error) {
             console.error('Error fetching trailers:', error);
+            setTrailersLoading(false);
+        } finally {
+            setTrailersLoading(false);
         }
     };
 
@@ -103,10 +70,8 @@ const Home: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (movies.length > 0) {
-            fetchLatestTrailers();
-        }
-    }, [movies]);
+        fetchLatestTrailers();
+    }, []);
 
     const handleSwitch = (option: "day" | "week") => {
         setTimeframe(option);
@@ -120,7 +85,7 @@ const Home: React.FC = () => {
             console.error("Invalid movie ID");
         }
     }
-    
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (query) {
@@ -253,28 +218,32 @@ const Home: React.FC = () => {
                     }}
                 >
                     <h2 className="text-2xl font-bold text-white mb-4 mt-4">Latest Trailers</h2>
-                    <div className="flex gap-4 overflow-x-auto">
-                        {trailers.map((trailer) => (
-                            <div
-                                key={trailer.id}
-                                className="w-[350px] text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
-                                onMouseEnter={() => setHoveredTrailer(trailer.movie.backdrop_path)}
-                            >
-                                <div className="relative" onClick={() => openModal(trailer)}>
-                                    <img
-                                        src={`https://img.youtube.com/vi/${trailer.key}/0.jpg`}
-                                        alt={trailer.name}
-                                        className="w-full h-[300px] rounded-md"
-                                    />
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
-                                        <FontAwesomeIcon className='w-10 h-10' icon={faPlay} />
+                    {trailersLoading ? (
+                        <p className="text-black text-center">Loading...</p>
+                    ) : (
+                        <div className="flex gap-4 overflow-x-auto">
+                            {trailers.map((trailer) => (
+                                <div
+                                    key={trailer.id}
+                                    className="w-[350px] text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
+                                    onMouseEnter={() => setHoveredTrailer(trailer.movie.backdrop_path)}
+                                >
+                                    <div className="relative" onClick={() => openModal(trailer)}>
+                                        <img
+                                            src={`https://img.youtube.com/vi/${trailer.key}/0.jpg`}
+                                            alt={trailer.name}
+                                            className="w-full h-[300px] rounded-md"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
+                                            <FontAwesomeIcon className='w-10 h-10' icon={faPlay} />
+                                        </div>
                                     </div>
+                                    <h3 className="font-bold text-white text-center text-sm mt-2" onClick={() => handleGoToDetail(trailer.movie.id)}>{trailer.movie.title}</h3>
+                                    <h4 className="font-semibold text-white text-center text-sm mt-2">{format(new Date(trailer.movie.release_date), 'MMM dd, yyyy')}</h4>
                                 </div>
-                                <h3 className="font-bold text-white text-center text-sm mt-2" onClick={() => handleGoToDetail(trailer.movie.id)}>{trailer.movie.title}</h3>
-                                <h4 className="font-semibold text-white text-center text-sm mt-2">{format(new Date(trailer.movie.release_date), 'MMM dd, yyyy')}</h4>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Modal */}

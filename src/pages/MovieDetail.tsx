@@ -37,7 +37,7 @@ const MovieDetail: React.FC = () => {
         }
     }, []);
 
-    const handleUserRating = (event: React.SyntheticEvent, newValue: number | null) => {
+    const handleUserRating = (_event: React.SyntheticEvent, newValue: number | null) => {
         setUserRating(newValue);
         console.log(`User rated: ${newValue}`);
         submitUserRating(newValue);

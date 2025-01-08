@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 const CastDetail: React.FC = () => {
     const { castId } = useParams<{ castId: string }>();
@@ -10,37 +11,15 @@ const CastDetail: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const TMDB_API_KEY = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
-
     useEffect(() => {
         const fetchCastDetail = async () => {
             setLoading(true);
 
             try {
-                const castResponse = await fetch(
-                    `https://api.themoviedb.org/3/person/${castId}`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${TMDB_API_KEY}`,
-                        },
-                    }
-                );
-                const castData = await castResponse.json();
-                setCast(castData);
+                const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/people/${castId}`);
+                setCast(response.data);
 
-                const moviesResponse = await fetch(
-                    `https://api.themoviedb.org/3/person/${castId}/movie_credits`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${TMDB_API_KEY}`,
-                        },
-                    }
-                );
-                const moviesData = await moviesResponse.json();
+                const moviesData = response.data.movie_credits.cast;
                 const sortedMovies = moviesData.cast.sort((a: any, b: any) => {
                     const releaseDateA = a.release_date ? new Date(a.release_date).getTime() : 0;
                     const releaseDateB = b.release_date ? new Date(b.release_date).getTime() : 0;
@@ -77,84 +56,6 @@ const CastDetail: React.FC = () => {
 
     return (
         <>
-            {/* <div className="p-4 flex items-center gap-6">
-                <div className="w-[500px] h-[500px] flex-shrink-0">
-                    <img
-                        src={`https://image.tmdb.org/t/p/w500/${cast.profile_path}`}
-                        alt={cast.name}
-                        className="w-full h-full object-cover rounded-lg shadow-lg"
-                    />
-                </div>
-
-                <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-center">{cast.name}</h2>
-
-                    <div>
-                        <p className="mt-4 font-bold">Biography</p>
-                        <p className="text-sm text-gray-500">{cast.biography || "No biography"}</p>
-                    </div>
-
-                    <div>
-                        <p className="mt-4 font-bold">Birthday</p>
-                        <p className="text-sm text-gray-500">{format(new Date(cast.birthday), 'MMMM dd, yyyy') || "No information"}</p>
-                        {cast.deathday && (
-                            <p className="text-sm text-gray-500">Died: {format(new Date(cast.deathday), 'MMMM dd, yyyy')}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <p className="mt-4 font-bold">Gender</p>
-                        <p className="text-sm text-gray-500">
-                            {cast.gender === 1 ? "Female" : cast.gender === 2 ? "Male" : "Not specified"}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p className="mt-4 font-bold">Known For</p>
-                        <p className="text-sm text-gray-500">{cast.known_for_department || "Not specified"}</p>
-                    </div>
-
-                    <div>
-                        <p className="mt-4 font-bold">Place of Birth</p>
-                        <p className="text-sm text-gray-500">{cast.place_of_birth || "Not specified"}</p>
-                    </div>
-
-                    <div>
-                        <p className="mt-4 font-bold">Also Known As</p>
-                        <p className="text-sm text-gray-500">{cast.also_known_as?.join(", ") || "None"}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="p-4">
-                <h3 className="text-2xl font-bold text-center mb-4">Movies</h3>
-                <div className="flex gap-4 overflow-x-auto">
-                    {movies.length > 0 ? (
-                        movies.map((movie: any) => {
-                            const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : "Unknown";
-
-                            return (
-                                <div
-                                    key={movie.id}
-                                    className="text-center w-[120px] h-[240px] flex-shrink-0 flex flex-col items-center"
-                                    onClick={() => handleGoToDetail(movie.id)}
-                                >
-                                    <p className="text-xs text-gray-500">{releaseYear}</p>
-                                    <img
-                                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                                        alt={movie.title}
-                                        className="mb-2 w-[120px] h-[180px] object-cover mx-auto shadow-lg rounded-lg hover:scale-105 transition-transform duration-300 ease-in-out"
-                                    />
-                                    <p className="text-sm text-black break-words line-clamp-2">{movie.title}</p>
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <p className="text-center text-white">No movies found for this cast member.</p>
-                    )}
-                </div>
-            </div> */}
-
             <div className="bg-gray-900 text-white min-h-screen">
                 <div className="h-[80px]">
                 </div>
