@@ -19,7 +19,7 @@ const CastDetail: React.FC = () => {
                 const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/people/${castId}`);
                 setCast(response.data);
 
-                const moviesData = response.data.movie_credits.cast;
+                const moviesData = response.data.movie_credits;
                 const sortedMovies = moviesData.cast.sort((a: any, b: any) => {
                     const releaseDateA = a.release_date ? new Date(a.release_date).getTime() : 0;
                     const releaseDateB = b.release_date ? new Date(b.release_date).getTime() : 0;
