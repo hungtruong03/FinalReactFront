@@ -2,15 +2,73 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import { CircularProgressbar } from 'react-circular-progressbar'; // Import thư viện vòng tròn
 import 'react-circular-progressbar/dist/styles.css'; // Import CSS của thư viện
+import './MovieDetail.css';
+import Rating from '@mui/material/Rating';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const customTheme = createTheme({
+    components: {
+        MuiRating: {
+            styleOverrides: {
+                iconEmpty: {
+                    color: '#666', // Màu cho các ngôi sao không được đánh giá
+                },
+            },
+        },
+    },
+});
 
 const MovieDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [movie, setMovie] = useState<any>(null);
     const [credits, setCredits] = useState<any[]>([]); // Mảng diễn viên
     const [loading, setLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userRating, setUserRating] = useState<number | null>(0);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const persistedData = localStorage.getItem('persist:root');
+        if (persistedData) {
+            const parsedData = JSON.parse(persistedData);
+            const isAuthenticated = JSON.parse(parsedData.isAuthenticated);
+            setIsLoggedIn(isAuthenticated);
+        }
+    }, []);
+
+    const handleUserRating = (event: React.SyntheticEvent, newValue: number | null) => {
+        setUserRating(newValue);
+        console.log(`User rated: ${newValue}`);
+        submitUserRating(newValue);
+    };
+
+    const submitUserRating = async (rating: number | null) => {
+        try {
+            const persistedData = localStorage.getItem('persist:root');
+            const parsedData = persistedData ? JSON.parse(persistedData) : null;
+            const accessToken = parsedData ? JSON.parse(parsedData.accessToken) : '';
+
+            const response = await fetch(`https://api.example.com/movies/${id}/rate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ rating }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit rating');
+            }
+
+            const data = await response.json();
+            console.log('Rating submitted successfully:', data);
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+        }
+    };
+
 
     useEffect(() => {
         const fetchMovieDetail = async () => {
@@ -75,9 +133,11 @@ const MovieDetail: React.FC = () => {
     }
 
     // Tính toán phần trăm từ rating
-    const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
+    // const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
+    const displayedRating = movie.vote_average;
 
     return (
+        <ThemeProvider theme={customTheme}>
         <div className="bg-gray-900 text-white min-h-screen">
             <div className="h-[80px]">
             </div>
@@ -97,7 +157,7 @@ const MovieDetail: React.FC = () => {
                         <p className="text-lg text-gray-400"><strong>Release Date:</strong> {format(new Date(movie.release_date), 'MMM dd, yyyy')}</p>
 
                         {/* Hiển thị vòng tròn rating */}
-                        <div className="flex items-center mt-4 mb-6">
+                        {/* <div className="flex items-center mt-4 mb-6">
                             <div className="w-24 h-24 mr-6">
                                 <CircularProgressbar
                                     value={ratingPercentage}
@@ -113,13 +173,42 @@ const MovieDetail: React.FC = () => {
                             <p className="text-xl text-white font-semibold"><strong>Rating:</strong> {movie.vote_average} / 10</p>
                         </div>
 
+                        <Rating
+                            name="user-rating"
+                            value={userRating}
+                            precision={0.1}
+                            onChange={handleUserRating}
+                            size="large"
+                        />
+                        <p className="text-gray-300 mt-2">Đánh giá của bạn: {userRating || 0} / 10</p> */}
+
+                        <div className="flex items-center mt-4 mb-6">
+                            <div className="text-center mr-4">
+                                <p className="text-4xl font-bold text-white">{displayedRating.toFixed(1)}</p>
+                                <p className="text-gray-400 text-sm">{movie.vote_count} votes</p>
+                            </div>
+                            <Rating
+                                name="movie-rating"
+                                value={displayedRating}
+                                max={10} // Thang điểm 10 sao
+                                precision={0.1}
+                                readOnly={!isLoggedIn || userRating === null} 
+                                onChange={handleUserRating}
+                                size="large"
+                            />
+                            <div className="text-center mr-4">
+                                <p className="text-gray-400 text-sm">Your rating</p>
+                                <p className="text-4xl font-bold text-white">{userRating}</p>
+                            </div>
+                        </div>
+
                         <p className="text-lg text-gray-400"><strong>Genres:</strong> {movie.genres.map((genre: any) => genre.name).join(', ')}</p>
 
-                        <h2 className="text-2xl mt-6 text-white">Overview</h2>
+                        <h2 className="text-2xl mt-6 font-bold text-white">Overview</h2>
                         <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
 
                         {/* Hiển thị danh sách diễn viên */}
-                        <h2 className="text-2xl mt-6 text-white">Cast</h2>
+                        <h2 className="text-2xl mt-6 font-bold text-white">Casts</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
                             {credits.slice(0, 10).map((actor) => (
                                 <div key={actor.id} className="text-center">
@@ -138,6 +227,7 @@ const MovieDetail: React.FC = () => {
                 </div>
             </div>
         </div>
+        </ThemeProvider>
     );
 };
 
