@@ -10,6 +10,8 @@ import MovieDetail from "../pages/MovieDetail";
 import CastDetail from "../pages/CastDetail";
 import SearchMovies from "../pages/SearchMovies";
 import ResetPassword from "../pages/ResetPassword";
+import Favourite from "../pages/Favourite"; 
+import WatchList from "../pages/Watchlist";
 export default function AppRouter() {
 	return (
 		<Router>
@@ -24,6 +26,8 @@ export default function AppRouter() {
                     <Route path="/movie/:id" element={<MovieDetail />} /> {/* Route cho MovieDetail */}
 					<Route path="/person/:castId" element={<CastDetail />} />
                     <Route path="/search/:query" element={<SearchMovies />} />
+                    <Route path="/favourite" element={<Favourite />} />
+                    <Route path="/watchlist" element={<WatchList />} />
                     <Route path="/resetpassword" element={<ResetPassword />} />
                 </Routes>
             </MainLayout>
