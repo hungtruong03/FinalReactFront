@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 const WatchList: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
     const [page, setPage] = useState(1);
