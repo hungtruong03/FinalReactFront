@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { RootState } from '../store/store';
 const Favourite: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+    useEffect(() => {
+        setAccessToken(getAccessToken);
+        console.log(accessToken);
+    }, [ getAccessToken]);
 
     const fetchCategoryData = async (type: string) => {
         try {

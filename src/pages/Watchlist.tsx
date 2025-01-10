@@ -1,41 +1,53 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 const WatchList: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
 
-    const fetchCategoryData = async (type: string) => {
+    useEffect(() => {
+        setAccessToken(getAccessToken);
+    }, [ getAccessToken]);
+    const fetchCategoryData = async () => {
+
         try {
-            const response = await fetch(
-                `https://api.themoviedb.org/3/discover/movie`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
-                    },
+            console.log(accessToken);
+            const response = await axios.get('http://localhost:3000/user/watchlist', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
                 }
-            );
-            return response.json();
+            });
+            const data = response.data;
+            console.log(data);
+            setMovies(data);
+            setTotalPages(data.total);
         } catch (error) {
-            console.error(`Error fetching ${type} data:`, error);
+            console.error(`Error fetchindata:`, error);
             return { total_results: 0, results: [] };
         }
     };
 
-    const fetchAllCategories = async () => {
-        const endpoints = ['movie'];
-        const results = await Promise.all(endpoints.map(fetchCategoryData));
-        const [movieData] = results;
-        setMovies(movieData.results);
-        setTotalPages(movieData.total_pages);
+    // const fetchAllCategories = async () => {
+    //     const endpoints = ['movie'];
+    //     const results = await Promise.all(endpoints.map(fetchCategoryData));
+    //     const [movieData] = results;
+    //     setMovies(movieData.results);
+    //     setTotalPages(movieData.total_pages);
 
-    };
+    // };
 
     useEffect(() => {
-        fetchAllCategories();
-    }, [page]);
+        if (accessToken) {
+            fetchCategoryData();
+        }
+    }, [page, accessToken]);
+    
 
 
     return (
