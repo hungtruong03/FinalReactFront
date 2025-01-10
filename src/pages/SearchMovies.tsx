@@ -47,7 +47,7 @@ const SearchMovies: React.FC = () => {
             };
     
             // Gửi request với query object
-            const response = await axios.get('http://localhost:3000/movies/search', {
+            const response = await axios.get('https://final-nest-back.vercel.app/movies/search', {
                 params: queryObject, // Sử dụng `params` để truyền query parameters
             });
             const data = await response.data;

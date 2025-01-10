@@ -32,15 +32,6 @@ const MovieDetail: React.FC = () => {
     const [userRating, setUserRating] = useState<number | null>(0);
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     const persistedData = localStorage.getItem('persist:root');
-    //     if (persistedData) {
-    //         const parsedData = JSON.parse(persistedData);
-    //         const isAuthenticated = JSON.parse(parsedData.isAuthenticated);
-    //         setIsLoggedIn(isAuthenticated);
-    //     }
-    // }, []);
-
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
     const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
 
@@ -57,19 +48,6 @@ const MovieDetail: React.FC = () => {
 
     const submitUserRating = async (rating: number | null) => {
         try {
-            // const persistedData = localStorage.getItem('persist:root');
-            // const parsedData = persistedData ? JSON.parse(persistedData) : null;
-            // const accessToken = parsedData ? JSON.parse(parsedData.accessToken) : '';
-            // const persistedData = localStorage.getItem('persist:root');
-            // let accessToken = '';
-
-            // if (persistedData) {
-            //     const parsedData = JSON.parse(persistedData);
-            //     if (parsedData.auth) { // Giả sử 'auth' là nơi lưu trữ accessToken
-            //         const authData = JSON.parse(parsedData.auth); 
-            //         accessToken = authData.accessToken || ''; // Trích xuất accessToken
-            //     }
-            // }
             if (!accessToken) {
                 console.log('Access token not found');
             }
@@ -77,25 +55,13 @@ const MovieDetail: React.FC = () => {
             // Use accessToken for your API call
             console.log('Submitting rating with token:', accessToken);
 
-            // const response = await fetch(`http://localhost:3000/user/${id}/rate`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         Authorization: `Bearer ${accessToken}`,
-            //     },
-            //     body: JSON.stringify({ rating }),
-            // });
-            const response =await axios.post(`http://localhost:3000/user/${id}/rate`,{rating},{
+            const response =await axios.post(`https://final-nest-back.vercel.app/user/${id}/rate`,{rating},{
                 headers:{
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 }
             })   
-            // if (!response.ok) {
-            //     throw new Error('Failed to submit rating');
-            // }
 
-            // const data = await response.json();
             console.log('Rating submitted successfully:', response);
         } catch (error) {
             console.error('Error submitting rating:', error);
@@ -107,7 +73,7 @@ const MovieDetail: React.FC = () => {
         const fetchMovieDetail = async () => {
             try {
                 // Fetch thông tin chi tiết phim
-                const movieResponse = await fetch(`http://localhost:3000/movies/detail/${id}`, {
+                const movieResponse = await fetch(`https://final-nest-back.vercel.app/movies/detail/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -123,7 +89,7 @@ const MovieDetail: React.FC = () => {
                 setMovie(movieData);
 
                 // Fetch danh sách diễn viên
-                const creditsResponse = await fetch(`http://localhost:3000/movies/credits/${id}`, {
+                const creditsResponse = await fetch(`https://final-nest-back.vercel.app/movies/credits/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
