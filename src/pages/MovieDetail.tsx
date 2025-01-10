@@ -6,6 +6,8 @@ import 'react-circular-progressbar/dist/styles.css'; // Import CSS của thư vi
 import './MovieDetail.css';
 import Rating from '@mui/material/Rating';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 
 const customTheme = createTheme({
     components: {
@@ -25,17 +27,26 @@ const MovieDetail: React.FC = () => {
     const [credits, setCredits] = useState<any[]>([]); // Mảng diễn viên
     const [loading, setLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
     const [userRating, setUserRating] = useState<number | null>(0);
     const navigate = useNavigate();
 
+    // useEffect(() => {
+    //     const persistedData = localStorage.getItem('persist:root');
+    //     if (persistedData) {
+    //         const parsedData = JSON.parse(persistedData);
+    //         const isAuthenticated = JSON.parse(parsedData.isAuthenticated);
+    //         setIsLoggedIn(isAuthenticated);
+    //     }
+    // }, []);
+
+    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+    const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
+
     useEffect(() => {
-        const persistedData = localStorage.getItem('persist:root');
-        if (persistedData) {
-            const parsedData = JSON.parse(persistedData);
-            const isAuthenticated = JSON.parse(parsedData.isAuthenticated);
-            setIsLoggedIn(isAuthenticated);
-        }
-    }, []);
+        setIsLoggedIn(isAuthenticated);
+        setAccessToken(getAccessToken);
+    }, [isAuthenticated, getAccessToken]);
 
     const handleUserRating = (_event: React.SyntheticEvent, newValue: number | null) => {
         setUserRating(newValue);
@@ -48,17 +59,23 @@ const MovieDetail: React.FC = () => {
             // const persistedData = localStorage.getItem('persist:root');
             // const parsedData = persistedData ? JSON.parse(persistedData) : null;
             // const accessToken = parsedData ? JSON.parse(parsedData.accessToken) : '';
-            const persistedData = localStorage.getItem('persist:root');
-            let accessToken = '';
-            
-            if (persistedData) {
-                const parsedData = JSON.parse(persistedData);
-                if (parsedData.auth) { // Giả sử 'auth' là nơi lưu trữ accessToken
-                    const authData = JSON.parse(parsedData.auth); 
-                    accessToken = authData.accessToken || ''; // Trích xuất accessToken
-                }
+            // const persistedData = localStorage.getItem('persist:root');
+            // let accessToken = '';
+
+            // if (persistedData) {
+            //     const parsedData = JSON.parse(persistedData);
+            //     if (parsedData.auth) { // Giả sử 'auth' là nơi lưu trữ accessToken
+            //         const authData = JSON.parse(parsedData.auth); 
+            //         accessToken = authData.accessToken || ''; // Trích xuất accessToken
+            //     }
+            // }
+            if (!accessToken) {
+                console.log('Access token not found');
             }
-            
+
+            // Use accessToken for your API call
+            console.log('Submitting rating with token:', accessToken);
+
             const response = await fetch(`http://localhost:3000/user/${id}/rate`, {
                 method: 'POST',
                 headers: {
@@ -147,26 +164,26 @@ const MovieDetail: React.FC = () => {
 
     return (
         <ThemeProvider theme={customTheme}>
-        <div className="bg-gray-900 text-white min-h-screen">
-            <div className="h-[80px]">
-            </div>
-            <div className="relative">
-                <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
-                    {/* Bên trái: Ảnh poster */}
-                    <div className="md:w-1/2 mb-6 md:mb-0  flex justify-center items-center">
-                        <img
-                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                            alt={movie.title}
-                            className="rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
-                        />
-                    </div>
-                    {/* Bên phải: Nội dung */}
-                    <div className="md:w-1/2 md:pl-6">
-                        <h1 className="text-4xl font-bold text-yellow-400 mb-3">{movie.title}</h1>
-                        <p className="text-lg text-gray-400"><strong>Release Date:</strong> {format(new Date(movie.release_date), 'MMM dd, yyyy')}</p>
+            <div className="bg-gray-900 text-white min-h-screen">
+                <div className="h-[80px]">
+                </div>
+                <div className="relative">
+                    <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
+                        {/* Bên trái: Ảnh poster */}
+                        <div className="md:w-1/2 mb-6 md:mb-0  flex justify-center items-center">
+                            <img
+                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                alt={movie.title}
+                                className="rounded-lg shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                            />
+                        </div>
+                        {/* Bên phải: Nội dung */}
+                        <div className="md:w-1/2 md:pl-6">
+                            <h1 className="text-4xl font-bold text-yellow-400 mb-3">{movie.title}</h1>
+                            <p className="text-lg text-gray-400"><strong>Release Date:</strong> {format(new Date(movie.release_date), 'MMM dd, yyyy')}</p>
 
-                        {/* Hiển thị vòng tròn rating */}
-                        {/* <div className="flex items-center mt-4 mb-6">
+                            {/* Hiển thị vòng tròn rating */}
+                            {/* <div className="flex items-center mt-4 mb-6">
                             <div className="w-24 h-24 mr-6">
                                 <CircularProgressbar
                                     value={ratingPercentage}
@@ -191,51 +208,51 @@ const MovieDetail: React.FC = () => {
                         />
                         <p className="text-gray-300 mt-2">Đánh giá của bạn: {userRating || 0} / 10</p> */}
 
-                        <div className="flex items-center mt-4 mb-6">
-                            <div className="text-center mr-4">
-                                <p className="text-4xl font-bold text-white">{displayedRating.toFixed(1)}</p>
-                                <p className="text-gray-400 text-sm">{movie.vote_count} votes</p>
-                            </div>
-                            <Rating
-                                name="movie-rating"
-                                value={displayedRating}
-                                max={10} // Thang điểm 10 sao
-                                precision={0.1}
-                                readOnly={!isLoggedIn || userRating === null} 
-                                onChange={handleUserRating}
-                                size="large"
-                            />
-                            <div className="text-center mr-4">
-                                <p className="text-gray-400 text-sm">Your rating</p>
-                                <p className="text-4xl font-bold text-white">{userRating}</p>
-                            </div>
-                        </div>
-
-                        <p className="text-lg text-gray-400"><strong>Genres:</strong> {movie.genres.map((genre: any) => genre.name).join(', ')}</p>
-
-                        <h2 className="text-2xl mt-6 font-bold text-white">Overview</h2>
-                        <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
-
-                        {/* Hiển thị danh sách diễn viên */}
-                        <h2 className="text-2xl mt-6 font-bold text-white">Casts</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
-                            {credits.slice(0, 10).map((actor) => (
-                                <div key={actor.id} className="text-center">
-                                    <img
-                                        src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
-                                        alt={actor.name}
-                                        className="mx-auto mb-2 shadow-lg rounded-lg hover:scale-105 transition-transform duration-300 ease-in-out"
-                                        style={{ width: '120px', height: '150px' }}
-                                        onClick={() => handleGoToCastDetail(actor.id)}
-                                    />
-                                    <p className="text-sm text-white">{actor.name}</p>
+                            <div className="flex items-center mt-4 mb-6">
+                                <div className="text-center mr-4">
+                                    <p className="text-4xl font-bold text-white">{displayedRating.toFixed(1)}</p>
+                                    <p className="text-gray-400 text-sm">{movie.vote_count} votes</p>
                                 </div>
-                            ))}
+                                <Rating
+                                    name="movie-rating"
+                                    value={displayedRating}
+                                    max={10} // Thang điểm 10 sao
+                                    precision={0.1}
+                                    readOnly={!isLoggedIn || userRating === null}
+                                    onChange={handleUserRating}
+                                    size="large"
+                                />
+                                <div className="text-center mr-4">
+                                    <p className="text-gray-400 text-sm">Your rating</p>
+                                    <p className="text-4xl font-bold text-white">{userRating}</p>
+                                </div>
+                            </div>
+
+                            <p className="text-lg text-gray-400"><strong>Genres:</strong> {movie.genres.map((genre: any) => genre.name).join(', ')}</p>
+
+                            <h2 className="text-2xl mt-6 font-bold text-white">Overview</h2>
+                            <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
+
+                            {/* Hiển thị danh sách diễn viên */}
+                            <h2 className="text-2xl mt-6 font-bold text-white">Casts</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+                                {credits.slice(0, 10).map((actor) => (
+                                    <div key={actor.id} className="text-center">
+                                        <img
+                                            src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                                            alt={actor.name}
+                                            className="mx-auto mb-2 shadow-lg rounded-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                                            style={{ width: '120px', height: '150px' }}
+                                            onClick={() => handleGoToCastDetail(actor.id)}
+                                        />
+                                        <p className="text-sm text-white">{actor.name}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         </ThemeProvider>
     );
 };
