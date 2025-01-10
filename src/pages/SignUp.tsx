@@ -406,6 +406,14 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                             label="OTP"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
+                            InputLabelProps={{
+                                sx: {
+                                    transform: 'translate(10px, 10px)',
+                                    '&.Mui-focused, &.MuiFormLabel-filled': {
+                                        transform: 'translate(0, -18px)',
+                                    },
+                                },
+                            }}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
                             <Button variant="outlined" onClick={() => setModalOpen(false)}>
