@@ -129,7 +129,26 @@ const MovieDetail: React.FC = () => {
             console.error("Invalid cast ID");
         }
     }
+    const handleWatchList = async () => {
+        try {
+           
+            if (!accessToken) {
+                console.log('Access token not found');
+            }
+            console.log('Submitting watchlist with token:', accessToken);
 
+            const response = await axios.post(`http://localhost:3000/user/watchlist/${id}`,{},{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
+           
+            console.log('Rating submitted successfully:', response);
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+        }
+    };
     // Tính toán phần trăm từ rating
     // const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
     const displayedRating = movie.vote_average;
@@ -138,6 +157,9 @@ const MovieDetail: React.FC = () => {
         <ThemeProvider theme={customTheme}>
             <div className="bg-gray-900 text-white min-h-screen">
                 <div className="h-[80px]">
+                    <button onClick={handleWatchList}>
+                        Watch List
+                    </button>
                 </div>
                 <div className="relative">
                     <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">

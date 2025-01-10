@@ -6,7 +6,7 @@ const SearchMovies: React.FC = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     var { query } = useParams<{ query: string }>();
-    var [que, setQuery] = useState('');
+    var [que, setQuery] = useState(query);
     const [showFilters, setShowFilters] = useState<boolean>(false);
     const [formData, setFormData] = useState({
         minVoteAverage: 0,
@@ -16,7 +16,7 @@ const SearchMovies: React.FC = () => {
         genres: '',
         sortBy: '',
         sortOrder: 'asc',
-        limit: '10',
+        limit: '12',
         page: '1',
     });
 
@@ -45,7 +45,7 @@ const SearchMovies: React.FC = () => {
                 sortOrder: formData.sortOrder || '',
                 limit: formData.limit?.toString() || '',
             };
-    
+            console.log(queryObject);
             // Gửi request với query object
             const response = await axios.get('https://final-nest-back.vercel.app/movies/search', {
                 params: queryObject, // Sử dụng `params` để truyền query parameters
@@ -62,7 +62,7 @@ const SearchMovies: React.FC = () => {
 
     useEffect(() => {
         fetchCategoryData();
-    }, [query, page]);
+    }, [ page]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,7 +85,7 @@ const SearchMovies: React.FC = () => {
                     <input
                         type="text"
                         placeholder="Search for a movies"
-                        value={que}
+                        value={que||query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="p-3 ps-6 md:w-[70%] w-[30%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
                     />

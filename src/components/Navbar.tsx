@@ -127,7 +127,7 @@ function ResponsiveAppBar() {
                             flexGrow: 1,
                             fontFamily: 'monospace',
                             fontWeight: 700,
-                                color: 'inherit',
+                            color: 'inherit',
                             textDecoration: 'none',
                         }}
                     >
@@ -168,21 +168,28 @@ function ResponsiveAppBar() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                <MenuItem onClick={() => navigate('/favourite')}>
-                                    <Typography textAlign="center">Favourite</Typography>
-                                </MenuItem>
-                                <MenuItem onClick={() => navigate('/watchlist')}>
-                                    <Typography textAlign="center">Watch List</Typography>
-                                </MenuItem>
-                                <MenuItem onClick={handleLogout}>
-                                    <Typography textAlign="center">Logout</Typography>
-                                </MenuItem>
+                                {isAuthenticated && (
+                                    <>
+                                        <MenuItem onClick={() => navigate('/favourite')}>
+                                            <Typography textAlign="center">Favourite</Typography>
+                                        </MenuItem>
+                                        <MenuItem onClick={() => navigate('/watchlist')}>
+                                            <Typography textAlign="center">Watch List</Typography>
+                                        </MenuItem>
+                                        <MenuItem onClick={handleLogout}>
+                                            <Typography textAlign="center">Logout</Typography>
+                                        </MenuItem>
+                                    </>
+                                )
+                                }
+
+
                             </Menu>
                         </Box>
                     ) : null}
                 </Toolbar>
             </Container>
-        </AppBar>
+        </AppBar >
     );
 }
 export default ResponsiveAppBar;
