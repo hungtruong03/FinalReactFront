@@ -26,6 +26,7 @@ const MovieDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [movie, setMovie] = useState<any>(null);
     const [credits, setCredits] = useState<any[]>([]); // Mảng diễn viên
+    const [reviews, setReviews] = useState<any[]>([]); // Reviews data
     const [loading, setLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -50,17 +51,15 @@ const MovieDetail: React.FC = () => {
         try {
             if (!accessToken) {
                 console.log('Access token not found');
+                return;
             }
 
-            // Use accessToken for your API call
-            console.log('Submitting rating with token:', accessToken);
-
-            const response =await axios.post(`https://final-nest-back.vercel.app/user/${id}/rate`,{rating},{
-                headers:{
+            const response = await axios.post(`https://final-nest-back.vercel.app/user/${id}/rate`, { rating }, {
+                headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 }
-            })   
+            });
 
             console.log('Rating submitted successfully:', response);
         } catch (error) {
@@ -68,6 +67,45 @@ const MovieDetail: React.FC = () => {
         }
     };
 
+    const handleAddToWatchlist = async () => {
+        try {
+            if (!accessToken) {
+                console.log('Access token not found');
+                return;
+            }
+
+            const response = await axios.post(`https://final-nest-back.vercel.app/user/watchlist/${id}`, {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            console.log('Movie added to watchlist:', response);
+        } catch (error) {
+            console.error('Error adding movie to watchlist:', error);
+        }
+    };
+
+    const handleAddToFavorites = async () => {
+        try {
+            if (!accessToken) {
+                console.log('Access token not found');
+                return;
+            }
+
+            const response = await axios.post(`https://final-nest-back.vercel.app/user/favorites/${id}`, {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            console.log('Movie added to favorites:', response);
+        } catch (error) {
+            console.error('Error adding movie to favorites:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchMovieDetail = async () => {
@@ -101,8 +139,24 @@ const MovieDetail: React.FC = () => {
                 }
 
                 const creditsData = await creditsResponse.json();
-                // console.log(creditsData);
                 setCredits(creditsData[0].cast); // Lưu danh sách diễn viên
+
+                // Fetch reviews
+                const reviewsResponse = await fetch(`https://final-nest-back.vercel.app/movies/reviews/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                if (!reviewsResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const reviewsData = await reviewsResponse.json();
+                console.log(reviewsData);
+                setReviews(reviewsData); // Lưu danh sách reviews
+
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching movie details or credits:', error);
@@ -128,21 +182,30 @@ const MovieDetail: React.FC = () => {
         } else {
             console.error("Invalid cast ID");
         }
-    }
+    };
 
-    // Tính toán phần trăm từ rating
-    // const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
     const displayedRating = movie.vote_average;
+
+    const WatchlistIcon = () => (
+        <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+    );
+    
+    const FavoritesIcon = () => (
+        <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1S9.6 1.84 9.18 3H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-1 14h2v-6h-2v6z" />
+        </svg>
+    );    
 
     return (
         <ThemeProvider theme={customTheme}>
             <div className="bg-gray-900 text-white min-h-screen">
-                <div className="h-[80px]">
-                </div>
+                <div className="h-[80px]"></div>
                 <div className="relative">
                     <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
                         {/* Bên trái: Ảnh poster */}
-                        <div className="md:w-1/2 mb-6 md:mb-0  flex justify-center items-center">
+                        <div className="md:w-1/2 mb-6 md:mb-0 flex justify-center items-start">
                             <img
                                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                                 alt={movie.title}
@@ -154,32 +217,6 @@ const MovieDetail: React.FC = () => {
                             <h1 className="text-4xl font-bold text-yellow-400 mb-3">{movie.title}</h1>
                             <p className="text-lg text-gray-400"><strong>Release Date:</strong> {format(new Date(movie.release_date), 'MMM dd, yyyy')}</p>
 
-                            {/* Hiển thị vòng tròn rating */}
-                            {/* <div className="flex items-center mt-4 mb-6">
-                            <div className="w-24 h-24 mr-6">
-                                <CircularProgressbar
-                                    value={ratingPercentage}
-                                    text={`${movie.vote_average} / 10`}
-                                    strokeWidth={12}
-                                    styles={{
-                                        path: { stroke: '#f39c12' },
-                                        trail: { stroke: '#444' },
-                                        text: { fill: '#fff', fontSize: '16px', fontWeight: 'bold' },
-                                    }}
-                                />
-                            </div>
-                            <p className="text-xl text-white font-semibold"><strong>Rating:</strong> {movie.vote_average} / 10</p>
-                        </div>
-
-                        <Rating
-                            name="user-rating"
-                            value={userRating}
-                            precision={0.1}
-                            onChange={handleUserRating}
-                            size="large"
-                        />
-                        <p className="text-gray-300 mt-2">Đánh giá của bạn: {userRating || 0} / 10</p> */}
-
                             <div className="flex items-center mt-4 mb-6">
                                 <div className="text-center mr-4">
                                     <p className="text-4xl font-bold text-white">{displayedRating.toFixed(1)}</p>
@@ -188,7 +225,7 @@ const MovieDetail: React.FC = () => {
                                 <Rating
                                     name="movie-rating"
                                     value={displayedRating}
-                                    max={10} // Thang điểm 10 sao
+                                    max={10}
                                     precision={0.1}
                                     readOnly={!isLoggedIn || userRating === null}
                                     onChange={handleUserRating}
@@ -200,12 +237,33 @@ const MovieDetail: React.FC = () => {
                                 </div>
                             </div>
 
-                            <p className="text-lg text-gray-400"><strong>Genres:</strong> {movie.genres.map((genre: any) => genre.name).join(', ')}</p>
+                            <div className="flex space-x-4 mt-4">
+                                {isLoggedIn && (
+                                    <>
+                                        <button
+                                            onClick={handleAddToWatchlist}
+                                            className="icon-button"
+                                            aria-label="Add to Watchlist"
+                                        >
+                                            <WatchlistIcon />
+                                        </button>
+                                        <button
+                                            onClick={handleAddToFavorites}
+                                            className="icon-button"
+                                            aria-label="Add to Favorites"
+                                        >
+                                            <FavoritesIcon />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+
+
+                            <p className="text-lg text-gray-400 mt-4"><strong>Genres:</strong> {movie.genres.map((genre: any) => genre.name).join(', ')}</p>
 
                             <h2 className="text-2xl mt-6 font-bold text-white">Overview</h2>
                             <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
 
-                            {/* Hiển thị danh sách diễn viên */}
                             <h2 className="text-2xl mt-6 font-bold text-white">Casts</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
                                 {credits.slice(0, 10).map((actor) => (
@@ -220,6 +278,47 @@ const MovieDetail: React.FC = () => {
                                         <p className="text-sm text-white">{actor.name}</p>
                                     </div>
                                 ))}
+                            </div>
+
+                            <h2 className="text-2xl mt-6 font-bold text-white">Reviews</h2>
+                            <div className="mt-4 space-y-4">
+                                {reviews.length > 0 ? (
+                                    reviews.map((review) => (
+                                        <div key={review.id} className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                                            <div className="flex items-center mb-2">
+                                                {review.author_details.avatar_path ? (
+                                                    <img
+                                                        src={`https://image.tmdb.org/t/p/w64_and_h64_face${review.author_details.avatar_path}`}
+                                                        alt={`${review.author}'s avatar`}
+                                                        className="w-10 h-10 rounded-full mr-4"
+                                                    />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center mr-4">
+                                                        <span className="text-white text-sm">NA</span>
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-yellow-400">
+                                                        {review.author || "Anonymous"}
+                                                    </h3>
+                                                    {review.author_details.rating !== null && (
+                                                        <p className="text-sm text-gray-400">
+                                                            Rating: {review.author_details.rating}/10
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <p className="text-gray-300">{review.content}</p>
+                                            <p className="text-gray-500 text-sm mt-2">
+                                                {new Date(review.created_at).toLocaleString()}
+                                            </p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="bg-gray-800 p-6 rounded-lg text-center">
+                                        <p className="text-gray-400">No reviews available for this movie.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
