@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 const Favourite: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
     const [page, setPage] = useState(1);
@@ -72,11 +72,11 @@ const Favourite: React.FC = () => {
                                         })
                                     }
                                     <div className="w-10 h-10 mb-2">
-                                    <img
-                                        src={`https://cdn1.iconfinder.com/data/icons/anchor/128/heart.png`}
-                                        className="w-50 h-50 object-contain"
-                                    />
-                                </div>
+                                        <img
+                                            src={`https://cdn1.iconfinder.com/data/icons/anchor/128/heart.png`}
+                                            className="w-50 h-50 object-contain"
+                                        />
+                                    </div>
                                 </h3>
 
                                 {item.overview && (

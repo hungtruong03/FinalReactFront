@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 const SearchMovies: React.FC = () => {
@@ -7,44 +8,63 @@ const SearchMovies: React.FC = () => {
     var { query } = useParams<{ query: string }>();
     var [que, setQuery] = useState('');
     const [showFilters, setShowFilters] = useState<boolean>(false);
-    const [sort, setSort] = useState<string>('popularity.desc');  // Filter by vote average
-    const [releaseYear, setReleaseYear] = useState<string[]>([]);
-    const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const year = e.target.value;
-        setReleaseYear(prevState =>
-            e.target.checked ? [...prevState, year] : prevState.filter((y) => y !== year)
-        );
+    const [formData, setFormData] = useState({
+        minVoteAverage: 0,
+        minVoteCount: 0,
+        releaseDateFrom: '',
+        releaseDateTo: '',
+        genres: '',
+        sortBy: '',
+        sortOrder: 'asc',
+        limit: '10',
+        page: '1',
+    });
+
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
     };
-    const fetchCategoryData = async (type: string) => {
+
+
+    const fetchCategoryData = async () => {
         try {
-            const response = await fetch(
-                `https://api.themoviedb.org/3/search/${type}?query=${query}&page=${page}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${import.meta.env.VITE_TMDB_ACCESS_TOKEN}`,
-                    },
-                }
-            );
-            return response.json();
+            // Tạo query parameters
+            const queryParams = new URLSearchParams({
+                keyword: query || '',
+                page: page.toString(),
+                minVoteAverage: formData.minVoteAverage?.toString() || '',
+                minVoteCount: formData.minVoteCount?.toString() || '',
+                releaseDateFrom: formData.releaseDateFrom || '',
+                releaseDateTo: formData.releaseDateTo || '',
+                genres: formData.genres || '',
+                sortBy: formData.sortBy || '',
+                sortOrder: formData.sortOrder || '',
+                limit: formData.limit?.toString() || '',
+            }).toString();
+            alert(`http://localhost:3000/movies/search?${queryParams}`)
+            const url = `http://localhost:3000/movies/search?${queryParams}`;
+            const response = await axios.get(url)
+
+            
+
+            const data = await response.data;
+
+            // Xử lý dữ liệu nhận được từ API
+            setMovies(data.movies || []);
+            setTotalPages(data.totalPages || 1); // Chắc chắn totalPages được sử dụng
         } catch (error) {
-            console.error(`Error fetching ${type} data:`, error);
-            return { total_results: 0, results: [] };
+            console.error('Error fetching movies:', error);
         }
     };
 
-    const fetchAllCategories = async () => {
-        const endpoints = ['movie'];
-        const results = await Promise.all(endpoints.map(fetchCategoryData));
-        const [movieData] = results;
-        setMovies(movieData.results);
-        setTotalPages(movieData.total_pages);
-
-    };
 
     useEffect(() => {
-        fetchAllCategories();
+        fetchCategoryData();
     }, [query, page]);
 
     const handleSearch = (e: React.FormEvent) => {
@@ -53,7 +73,7 @@ const SearchMovies: React.FC = () => {
         if (que) {
             setPage(1);
             query = que;
-            fetchAllCategories();
+            fetchCategoryData();
 
         } else {
             console.error("Error");
@@ -96,43 +116,87 @@ const SearchMovies: React.FC = () => {
                         </button>
 
                         {/* Menu bộ lọc (Filter Menu) */}
+                        {/* Filter Menu */}
                         {showFilters && (
                             <div className="absolute top-50 left-6 bg-gray-800 p-6 rounded-lg shadow-lg w-80 space-y-6">
                                 <div>
-                                    <h3 className="text-lg text-yellow-400 mb-2">Filter by Release Year</h3>
-                                    <div className="flex flex-wrap">
-                                        {[1990, 2000, 2010, 2020].map((year) => (
-                                            <div key={year} className="flex items-center mr-4 mb-2">
-                                                <input
-                                                    type="checkbox"
-                                                    value={year.toString()}
-                                                    onChange={handleYearChange}
-                                                    id={`year-${year}`}
-                                                    className="mr-2"
-                                                />
-                                                <label htmlFor={`year-${year}`} className="text-gray-400">
-                                                    {year}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <h3 className="text-lg text-yellow-400 mb-2">Filter by Vote Average</h3>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="10"
+                                        step="0.1"
+                                        value={formData.minVoteAverage}
+                                        onChange={handleChange}
+                                        name="minVoteAverage"
+                                        className="w-full"
+                                    />
+                                    <span className="text-gray-400">Min Vote: {formData.minVoteAverage}</span>
                                 </div>
 
+                                <div>
+                                    <h3 className="text-lg text-yellow-400 mb-2">Filter by Vote Count</h3>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="10000"
+                                        step="50"
+                                        value={formData.minVoteCount}
+                                        onChange={handleChange}
+                                        name="minVoteCount"
+                                        className="w-full"
+                                    />
+                                    <span className="text-gray-400">Min Vote Count: {formData.minVoteCount}</span>
+                                </div>
 
+                                <div>
+                                    <h3 className="text-lg text-yellow-400 mb-2">Release Date From</h3>
+                                    <input
+                                        type="date"
+                                        name="releaseDateFrom"
+                                        value={formData.releaseDateFrom}
+                                        onChange={handleChange}
+                                        className="p-3 rounded-full w-full text-gray-900"
+                                    />
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg text-yellow-400 mb-2">Release Date To</h3>
+                                    <input
+                                        type="date"
+                                        name="releaseDateTo"
+                                        value={formData.releaseDateTo}
+                                        onChange={handleChange}
+                                        className="p-3 rounded-full w-full text-gray-900"
+                                    />
+                                </div>
+
+                                <div>
+                                    <h3 className="text-lg text-yellow-400 mb-2">Genres</h3>
+                                    <input
+                                        type="text"
+                                        name="genres"
+                                        value={formData.genres}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Action, Drama"
+                                        className="p-3 rounded-full w-full text-gray-900"
+                                    />
+                                </div>
 
                                 <div>
                                     <h3 className="text-lg text-yellow-400 mb-2">Sort By</h3>
                                     <select
-                                        id="sort"
-                                        value={sort}
-                                        onChange={(e) => setSort(e.target.value)}
-                                        className="p-3 rounded-full text-gray-900 w-full"
+                                        name="sortBy"
+                                        value={formData.sortBy}
+                                        onChange={handleChange}
+                                        className="p-3 rounded-full w-full text-gray-900"
                                     >
-                                        <option value="popularity.desc">Popularity</option>
-                                        <option value="vote_average.desc">Vote Average</option>
-                                        <option value="release_date.desc">Release Date</option>
+                                        <option value="vote_average">Vote Average</option>
+                                        <option value="release_date">Release Date</option>
                                     </select>
                                 </div>
+
+
                             </div>
                         )}
                     </div>

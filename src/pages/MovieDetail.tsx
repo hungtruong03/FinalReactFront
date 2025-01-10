@@ -45,11 +45,21 @@ const MovieDetail: React.FC = () => {
 
     const submitUserRating = async (rating: number | null) => {
         try {
+            // const persistedData = localStorage.getItem('persist:root');
+            // const parsedData = persistedData ? JSON.parse(persistedData) : null;
+            // const accessToken = parsedData ? JSON.parse(parsedData.accessToken) : '';
             const persistedData = localStorage.getItem('persist:root');
-            const parsedData = persistedData ? JSON.parse(persistedData) : null;
-            const accessToken = parsedData ? JSON.parse(parsedData.accessToken) : '';
-
-            const response = await fetch(`https://api.example.com/movies/${id}/rate`, {
+            let accessToken = '';
+            
+            if (persistedData) {
+                const parsedData = JSON.parse(persistedData);
+                if (parsedData.auth) { // Giả sử 'auth' là nơi lưu trữ accessToken
+                    const authData = JSON.parse(parsedData.auth); 
+                    accessToken = authData.accessToken || ''; // Trích xuất accessToken
+                }
+            }
+            
+            const response = await fetch(`http://localhost:3000/user/${id}/rate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,12 +68,12 @@ const MovieDetail: React.FC = () => {
                 body: JSON.stringify({ rating }),
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to submit rating');
-            }
+            // if (!response.ok) {
+            //     throw new Error('Failed to submit rating');
+            // }
 
-            const data = await response.json();
-            console.log('Rating submitted successfully:', data);
+            // const data = await response.json();
+            console.log('Rating submitted successfully:', response);
         } catch (error) {
             console.error('Error submitting rating:', error);
         }
