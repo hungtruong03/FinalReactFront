@@ -168,8 +168,11 @@ function ResponsiveAppBar() {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                <MenuItem onClick={() => navigate('/private')}>
-                                    <Typography textAlign="center">Private</Typography>
+                                <MenuItem onClick={() => navigate('/favourite')}>
+                                    <Typography textAlign="center">Favourite</Typography>
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/watchlist')}>
+                                    <Typography textAlign="center">Watch List</Typography>
                                 </MenuItem>
                                 <MenuItem onClick={handleLogout}>
                                     <Typography textAlign="center">Logout</Typography>

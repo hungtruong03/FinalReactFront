@@ -8,6 +8,7 @@ import Rating from '@mui/material/Rating';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { RootState } from '../store/store';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const customTheme = createTheme({
     components: {
@@ -76,15 +77,20 @@ const MovieDetail: React.FC = () => {
             // Use accessToken for your API call
             console.log('Submitting rating with token:', accessToken);
 
-            const response = await fetch(`http://localhost:3000/user/${id}/rate`, {
-                method: 'POST',
-                headers: {
+            // const response = await fetch(`http://localhost:3000/user/${id}/rate`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         Authorization: `Bearer ${accessToken}`,
+            //     },
+            //     body: JSON.stringify({ rating }),
+            // });
+            const response =await axios.post(`http://localhost:3000/user/${id}/rate`,{rating},{
+                headers:{
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({ rating }),
-            });
-
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })   
             // if (!response.ok) {
             //     throw new Error('Failed to submit rating');
             // }
@@ -101,7 +107,7 @@ const MovieDetail: React.FC = () => {
         const fetchMovieDetail = async () => {
             try {
                 // Fetch thông tin chi tiết phim
-                const movieResponse = await fetch(`http://localhost:3000/movies/${id}`, {
+                const movieResponse = await fetch(`http://localhost:3000/movies/detail/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -117,7 +123,7 @@ const MovieDetail: React.FC = () => {
                 setMovie(movieData);
 
                 // Fetch danh sách diễn viên
-                const creditsResponse = await fetch(`http://localhost:3000/movies/${id}/credits`, {
+                const creditsResponse = await fetch(`http://localhost:3000/movies/credits/${id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'

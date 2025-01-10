@@ -33,8 +33,7 @@ const SearchMovies: React.FC = () => {
 
     const fetchCategoryData = async () => {
         try {
-            // Tạo query parameters
-            const queryParams = new URLSearchParams({
+            const queryObject = {
                 keyword: query || '',
                 page: page.toString(),
                 minVoteAverage: formData.minVoteAverage?.toString() || '',
@@ -45,16 +44,14 @@ const SearchMovies: React.FC = () => {
                 sortBy: formData.sortBy || '',
                 sortOrder: formData.sortOrder || '',
                 limit: formData.limit?.toString() || '',
-            }).toString();
-            alert(`http://localhost:3000/movies/search?${queryParams}`)
-            const url = `http://localhost:3000/movies/search?${queryParams}`;
-            const response = await axios.get(url)
-
-            
-
+            };
+    
+            // Gửi request với query object
+            const response = await axios.get('http://localhost:3000/movies/search', {
+                params: queryObject, // Sử dụng `params` để truyền query parameters
+            });
             const data = await response.data;
-
-            // Xử lý dữ liệu nhận được từ API
+            console.log(data)
             setMovies(data.movies || []);
             setTotalPages(data.totalPages || 1); // Chắc chắn totalPages được sử dụng
         } catch (error) {
