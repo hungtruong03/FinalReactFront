@@ -22,7 +22,7 @@ const Home: React.FC = () => {
     const [hoveredTrailer, setHoveredTrailer] = useState('');
     const [trailersLoading, setTrailersLoading] = useState(false);
     const [timeframe, setTimeframe] = useState<"day" | "week">("day");
-
+    const [AI,setAI] =useState<"search" | "AI">("search");
     const fetchMovies = async () => {
         const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/trending/${timeframe}?limit=20`)
         setMovies(response.data);
@@ -76,7 +76,9 @@ const Home: React.FC = () => {
     const handleSwitch = (option: "day" | "week") => {
         setTimeframe(option);
     };
-
+    const handleAI = (option: "search" | "AI") => {
+        setAI(option);
+    };
     const handleGoToDetail = (id: number) => {
         if (id) {
             console.log(id);
@@ -90,7 +92,7 @@ const Home: React.FC = () => {
         e.preventDefault();
         if (query) {
             console.log(query);
-            navigate(`/search/${query}`);
+            navigate(`/search/${query}`,{state:AI});
         } else {
             console.error("Error");
         }
@@ -116,20 +118,43 @@ const Home: React.FC = () => {
                             {message}
                         </p>
                     )}
-                    <form onSubmit={handleSearch} className="w-full mb-6">
-                        <input
-                            type="text"
-                            placeholder="Search for a movies"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="p-3 ps-6 w-[50%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
-                        />
-                        <button
-                            type="submit"
-                            className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-semibold"
-                        >
-                            Search
-                        </button>
+                    <form onSubmit={handleSearch} className="w-full mb-6 mx-auto">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search for a movies"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                className="p-4  w-[60%] rounded-l-full text-gray-900 flex-grow focus:outline-none"
+                            />
+                            {/* <button
+                                type="submit"
+                                className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-semibold"
+                            >
+                                Search
+                            </button> */}
+                            <div className="absolute top-0 bottom-0 right-0  flex items-center justify-end pe-[15%]">
+                                <div className="relative flex bg-gradient-to-r from-pink-500 to-purple-900 p-4 mt-4 mb-4 rounded-full w-[250px]">
+                                    <div
+                                        className={`absolute inset-y-0 m-2 bg-pink-600 rounded-full transition-all ${AI === "search" ? "w-1/2 left-0 ml-2" : "w-1/2 left-1/2 -ml-2"}`}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className={`relative z-5 flex-1 text-white ${AI === "search" ? "font-bold" : ""}`}
+                                        onClick={() => {handleAI("search");handleSearch}}
+                                    >
+                                        Search
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className={`relative z-5 flex-1 text-white ${AI === "AI" ? "font-bold" : ""}`}
+                                        onClick={() =>  {handleAI("AI");handleSearch}}
+                                    >
+                                        AI
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
