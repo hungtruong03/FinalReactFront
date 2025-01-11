@@ -39,7 +39,7 @@ const SearchMovies: React.FC = () => {
         try {
             // alert(location.state)
             const queryObject = {
-                keyword: query || '',
+                keyword: que || '',
                 page: page.toString(),
                 minVoteAverage: formData.minVoteAverage?.toString() || '',
                 minVoteCount: formData.minVoteCount?.toString() || '',
