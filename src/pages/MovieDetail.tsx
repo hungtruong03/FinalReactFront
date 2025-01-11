@@ -8,6 +8,7 @@ import Rating from '@mui/material/Rating';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { RootState } from '../store/store';
 import { useSelector } from 'react-redux';
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
 const customTheme = createTheme({
@@ -31,6 +32,7 @@ const MovieDetail: React.FC = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [userRating, setUserRating] = useState<number | null>(0);
+    const [highlightCasts, setHighlightCasts] = useState(false);
     const navigate = useNavigate();
 
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -159,6 +161,19 @@ const MovieDetail: React.FC = () => {
                 setReviews(reviewsData); // Lưu danh sách reviews
 
                 setLoading(false);
+
+                setTimeout(() => {
+                    const hash = window.location.hash;
+                    if (hash === '#casts') {
+                        const element = document.getElementById('casts');
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+
+                            setHighlightCasts(true);
+                            setTimeout(() => setHighlightCasts(false), 2000); // Remove highlight after 2 seconds
+                        }
+                    }
+                }, 500);
             } catch (error) {
                 console.error('Error fetching movie details or credits:', error);
                 setLoading(false);
@@ -169,11 +184,11 @@ const MovieDetail: React.FC = () => {
     }, [id]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className='bg-gray-900 text-white flex justify-center'><CircularProgress className='mt-72 mb-72' /></div>;
     }
 
     if (!movie) {
-        return <div>Movie not found</div>;
+        return <div className='text-2xl mt-6 font-bold text-white'>Movie not found</div>;
     }
 
     const handleGoToCastDetail = (castId: number) => {
@@ -224,11 +239,11 @@ const MovieDetail: React.FC = () => {
     return (
         <ThemeProvider theme={customTheme}>
             <div className="bg-gray-900 text-white min-h-screen">
-                <div className="h-[80px]">
+                {/* <div className="h-[80px]">
                     <button onClick={handleWatchList}>
                         Watch List
                     </button>
-                </div>
+                </div> */}
                 <div className="relative">
                     <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
                         {/* Bên trái: Ảnh poster */}
@@ -291,8 +306,8 @@ const MovieDetail: React.FC = () => {
                             <h2 className="text-2xl mt-6 font-bold text-white">Overview</h2>
                             <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
 
-                            <h2 className="text-2xl mt-6 font-bold text-white">Casts</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+                            <h2 id="casts" className="text-2xl mt-6 font-bold text-white">Casts</h2>
+                            <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4 ${highlightCasts ? 'border-4 border-yellow-400' : ''}`}>
                                 {credits.slice(0, 10).map((actor) => (
                                     <div key={actor.id} className="text-center">
                                         <img

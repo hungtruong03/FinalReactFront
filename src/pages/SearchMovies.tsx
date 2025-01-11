@@ -1,3 +1,4 @@
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
@@ -10,6 +11,7 @@ const SearchMovies: React.FC = () => {
     const [showFilters, setShowFilters] = useState<boolean>(false);
     const location = useLocation();
     const [timeframe, setTimeframe] = useState<"search" | "AI">(location.state);
+    const [loading, setLoading] = useState(true);
 
     const [formData, setFormData] = useState({
         minVoteAverage: 0,
@@ -23,8 +25,6 @@ const SearchMovies: React.FC = () => {
         page: '1',
     });
 
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -33,8 +33,9 @@ const SearchMovies: React.FC = () => {
         }));
     };
 
-
     const fetchCategoryData = async () => {
+        setLoading(true);
+
         try {
             // alert(location.state)
             const queryObject = {
@@ -50,23 +51,28 @@ const SearchMovies: React.FC = () => {
                 limit: formData.limit?.toString() || '',
             };
             console.log(queryObject);
-            let response ;
+            let response;
             if (timeframe === "search") {
                 response = await axios.get('https://final-nest-back.vercel.app/movies/search', {
-                    params: queryObject, 
+                    params: queryObject,
                 });
             } else {
                 response = await axios.get('https://final-nest-back.vercel.app/movies/searchAI', {
-                    params: queryObject, 
+                    params: queryObject,
                 });
             }
 
             const data = await response.data;
             console.log(data)
             setMovies(data.movies || []);
-            setTotalPages(data.totalPages || 1); 
+            setTotalPages(data.totalPages || 1);
+
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching movies:', error);
+            setLoading(false);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -235,44 +241,50 @@ const SearchMovies: React.FC = () => {
 
 
                 {/* Category Results */}
-                <div className="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {movies.map((item) => (
-                        <div
-                            key={item.id}
-                            className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
-                        >
-                            <Link to={`/movie/${item.id}`}>
-                                <img
-                                    src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`}
-                                    alt={item.title || item.name}
-                                    className="w-full h-64 object-cover"
-                                />
-                                <div className="p-4">
-                                    <h2 className="text-xl font-bold text-yellow-300">
-                                        {item.title || item.name}
-                                    </h2>
-                                    <h3 className="text-s  text-yellow-500">
-                                        {item.release_date &&
-                                            new Date(item.release_date).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric',
-                                            })
-                                        }
-                                    </h3>
+                {loading ? (
+                    <div className='flex justify-center'>
+                        <CircularProgress />
+                    </div>
+                ) : (
+                    <div className="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {movies.map((item) => (
+                            <div
+                                key={item.id}
+                                className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                            >
+                                <Link to={`/movie/${item.id}`}>
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`}
+                                        alt={item.title || item.name}
+                                        className="w-full h-64 object-cover"
+                                    />
+                                    <div className="p-4">
+                                        <h2 className="text-xl font-bold text-yellow-300">
+                                            {item.title || item.name}
+                                        </h2>
+                                        <h3 className="text-s  text-yellow-500">
+                                            {item.release_date &&
+                                                new Date(item.release_date).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                })
+                                            }
+                                        </h3>
 
-                                    {item.overview && (
-                                        <p className="text-sm text-gray-400">
-                                            {item.overview.length > 150
-                                                ? `${item.overview.substring(0, 150)}...`
-                                                : item.overview}
-                                        </p>
-                                    )}
-                                </div>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
+                                        {item.overview && (
+                                            <p className="text-sm text-gray-400">
+                                                {item.overview.length > 150
+                                                    ? `${item.overview.substring(0, 150)}...`
+                                                    : item.overview}
+                                            </p>
+                                        )}
+                                    </div>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Pagination */}

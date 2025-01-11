@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
 const CastDetail: React.FC = () => {
@@ -38,11 +39,11 @@ const CastDetail: React.FC = () => {
     }, [castId]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className='bg-gray-900 text-white flex justify-center'><CircularProgress className='mt-72 mb-72' /></div>;
     }
 
     if (!cast) {
-        return <div>Cast not found</div>;
+        return <div className='text-2xl mt-6 font-bold text-white'>Cast not found</div>;
     }
 
     const handleGoToDetail = (id: number) => {

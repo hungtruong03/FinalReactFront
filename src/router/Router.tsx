@@ -12,6 +12,7 @@ import SearchMovies from "../pages/SearchMovies";
 import ResetPassword from "../pages/ResetPassword";
 import Favourite from "../pages/Favourite";
 import WatchList from "../pages/Watchlist";
+import Profile from "../pages/Profile";
 export default function AppRouter() {
     return (
         <Router>
@@ -22,6 +23,7 @@ export default function AppRouter() {
                     <Route path={paths.REGISTER} element={<Register />} />
                     <Route element={<PrivateRoute />}>
                         <Route path="/private" element={<Private />} />
+                        <Route path="/profile" element={<Profile />} />
                         <Route path="/favourite" element={<Favourite />} />
                         <Route path="/watchlist" element={<WatchList />} />
                     </Route>
