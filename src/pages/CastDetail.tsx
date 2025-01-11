@@ -43,7 +43,7 @@ const CastDetail: React.FC = () => {
     }
 
     if (!cast) {
-        return <div className='text-2xl mt-6 font-bold text-white'>Cast not found</div>;
+        return <div className='text-2xl mt-6 font-bold text-black text-center'>Cast not found</div>;
     }
 
     const handleGoToDetail = (id: number) => {
