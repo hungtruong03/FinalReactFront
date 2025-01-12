@@ -133,7 +133,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         setLoading(true);
 
         try {
-            const response = await fetch('https://final-nest-back.vercel.app/user/login', {
+            const response = await fetch('http://final-nest-back.vercel.app/user/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

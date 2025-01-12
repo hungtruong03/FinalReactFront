@@ -7,6 +7,8 @@ import Modal from 'react-modal';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 
 Modal.setAppElement('#root');
 
@@ -23,6 +25,54 @@ const Home: React.FC = () => {
     const [trailersLoading, setTrailersLoading] = useState(false);
     const [timeframe, setTimeframe] = useState<"day" | "week">("day");
     const [AI,setAI] =useState<"search" | "AI">("search");
+    const [recommendedMovies, setRecommendedMovies] = useState<any[]>([]);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+
+    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+    const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
+
+    useEffect(() => {
+        setIsLoggedIn(isAuthenticated);
+        setAccessToken(getAccessToken);
+    }, [isAuthenticated, getAccessToken]);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+    
+        const fetchRecommendations = async () => {
+            try {
+                const response = await axios.get('https://final-nest-back.vercel.app/user/recommendations', {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`, // Gửi token xác thực
+                    },
+                });
+                console.log(response.data);
+                setRecommendedMovies(response.data);
+            } catch (error) {
+                console.error('Error fetching recommendations:', error);
+            }
+        };
+    
+        if (accessToken) {
+            // Gọi lần đầu tiên ngay khi component mount
+            fetchRecommendations();
+    
+            // Thiết lập polling
+            interval = setInterval(() => {
+                fetchRecommendations();
+            }, 120000);
+        }
+    
+        // Dọn dẹp interval khi component unmount
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [accessToken]);
+    
+
     const fetchMovies = async () => {
         const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/trending/${timeframe}?limit=20`)
         setMovies(response.data);
@@ -348,6 +398,41 @@ const Home: React.FC = () => {
                         })}
                     </div>
                 </div>
+
+                {isLoggedIn && (
+                    <div className="p-4 mt-4">
+                        <h2 className="text-2xl font-bold text-black mb-4 mt-4">Recommended for You</h2>
+                        <div className="overflow-x-auto">
+                            <div className="flex gap-4">
+                                {recommendedMovies.map((movie) => (
+                                    <div
+                                        key={movie.id}
+                                        className="w-[200px] bg-gray-800 text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
+                                        onClick={() => handleGoToDetail(movie.id)}
+                                    >
+                                        <div className="relative">
+                                            <img
+                                                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                                                alt={movie.title}
+                                                className="rounded-md w-[180px] h-[200px] object-cover mb-4 mx-auto"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col items-center">
+                                            <h3 className="font-bold text-center text-sm break-words line-clamp-2" title={movie.title}>
+                                                {movie.title}
+                                            </h3>
+                                            <p className="text-xs italic text-center">
+                                                {movie.release_date ? format(new Date(movie.release_date), 'MMM dd, yyyy') : 'Unknown'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+
             </div>
         </div>
     );

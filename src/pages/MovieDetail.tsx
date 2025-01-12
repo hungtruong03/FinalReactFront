@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import 'react-circular-progressbar/dist/styles.css'; // Import CSS của thư viện
+import 'react-circular-progressbar/dist/styles.css';
 import './MovieDetail.css';
 import Rating from '@mui/material/Rating';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -16,7 +16,7 @@ const customTheme = createTheme({
         MuiRating: {
             styleOverrides: {
                 iconEmpty: {
-                    color: '#666', // Màu cho các ngôi sao không được đánh giá
+                    color: '#666',
                 },
             },
         },
@@ -114,14 +114,12 @@ const MovieDetail: React.FC = () => {
 
                 console.log(vote_average, vote_count);
     
-                // Cập nhật thông tin phim
                 setMovie((prevMovie) => ({
                     ...prevMovie,
                     vote_average,
                     vote_count,
                 }));
     
-                // Cập nhật điểm đánh giá của user
                 setUserRating(rating);
             }
         } catch (error) {
