@@ -28,6 +28,7 @@ const Home: React.FC = () => {
     const [recommendedMovies, setRecommendedMovies] = useState<any[]>([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [recommendationMode, setRecommendationMode] = useState<"history" | "vector">("history");
 
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
     const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -39,10 +40,15 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
-    
+
         const fetchRecommendations = async () => {
             try {
-                const response = await axios.get('https://final-nest-back.vercel.app/user/recommendations', {
+                const endpoint =
+                    recommendationMode === "history"
+                        ? "/user/recommendations"
+                        : "/recommendation/vector";
+    
+                const response = await axios.get(`https://final-nest-back.vercel.app${endpoint}`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`, // Gửi token xác thực
                     },
@@ -50,7 +56,7 @@ const Home: React.FC = () => {
                 console.log(response.data);
                 setRecommendedMovies(response.data);
             } catch (error) {
-                console.error('Error fetching recommendations:', error);
+                console.error("Error fetching recommendations:", error);
             }
         };
     
@@ -70,8 +76,7 @@ const Home: React.FC = () => {
                 clearInterval(interval);
             }
         };
-    }, [accessToken]);
-    
+    }, [accessToken, recommendationMode]);
 
     const fetchMovies = async () => {
         const response = await axios.get(`https://final-nest-back.vercel.app/homeapi/trending/${timeframe}?limit=20`)
@@ -401,10 +406,45 @@ const Home: React.FC = () => {
 
                 {isLoggedIn && (
                     <div className="p-4 mt-4">
-                        <h2 className="text-2xl font-bold text-black mb-4 mt-4">Recommended for You</h2>
+                        <div className="flex items-center mb-4 mt-4">
+                            <h2 className="text-2xl font-bold text-black mb-4 mt-4">Recommended for You</h2>
+                            <div className="relative flex bg-gray-800 p-2 rounded-full w-80 ml-4">
+                                <div
+                                    className={`absolute h-3/5 bg-gray-700 rounded-full transition-all ${
+                                        recommendationMode === "history" ? "w-1/2 left-0 ml-2" : "w-1/2 left-1/2 -ml-2"
+                                    }`}
+                                />
+                                <button
+                                    className={`relative z-5 flex-1 text-white ${
+                                        recommendationMode === "history" ? "font-bold" : ""
+                                    }`}
+                                    onClick={() => setRecommendationMode("history")}
+                                >
+                                    User History
+                                </button>
+                                <button
+                                    className={`relative z-5 flex-1 text-white ${
+                                        recommendationMode === "vector" ? "font-bold" : ""
+                                    }`}
+                                    onClick={() => setRecommendationMode("vector")}
+                                >
+                                    Vector Search
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="overflow-x-auto">
                             <div className="flex gap-4">
-                                {recommendedMovies.map((movie) => (
+                                {recommendedMovies.map((movie) => {
+                                    const ratingPercentage = Math.round(movie.vote_average * 10);
+
+                                    const getColor = () => {
+                                        if (movie.vote_count === 0) return '#6c757d'; // Gray
+                                        if (ratingPercentage > 70) return '#27ae60'; // Green
+                                        if (ratingPercentage >= 50) return '#f1c40f'; // Yellow
+                                        return '#e74c3c'; // Red
+                                    };
+                                    return (
                                     <div
                                         key={movie.id}
                                         className="w-[200px] bg-gray-800 text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
@@ -416,6 +456,20 @@ const Home: React.FC = () => {
                                                 alt={movie.title}
                                                 className="rounded-md w-[180px] h-[200px] object-cover mb-4 mx-auto"
                                             />
+                                            <div className="absolute -top-2 -left-2 w-10 h-10 bg-[#2d2d2d] rounded-full">
+                                            <CircularProgressbar
+                                                value={movie.vote_count === 0 ? 0 : ratingPercentage}
+                                                text={movie.vote_count === 0 ? "NR" : `${ratingPercentage.toString()}%`}
+                                                strokeWidth={12}
+                                                styles={buildStyles({
+                                                    pathColor: getColor(),
+                                                    backgroundColor: "#2d2d2d",
+                                                    trailColor: '#444',
+                                                    textColor: '#fff',
+                                                    textSize: '32px',
+                                                })}
+                                            />
+                                        </div>
                                         </div>
                                         <div className="flex flex-col items-center">
                                             <h3 className="font-bold text-center text-sm break-words line-clamp-2" title={movie.title}>
@@ -426,7 +480,7 @@ const Home: React.FC = () => {
                                             </p>
                                         </div>
                                     </div>
-                                ))}
+                                )})}
                             </div>
                         </div>
                     </div>
