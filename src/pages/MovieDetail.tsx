@@ -24,13 +24,23 @@ const customTheme = createTheme({
 
 const MovieDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [movie, setMovie] = useState<any>(null);
+    const [movie, setMovie] = useState({
+        vote_average: 0,
+        vote_count: 0,
+        poster_path: '',
+        title: '',
+        release_date: '',
+        genres: [],
+        overview: '',
+    });
+    
     const [credits, setCredits] = useState<any[]>([]); // Mảng diễn viên
     const [reviews, setReviews] = useState<any[]>([]); // Reviews data
     const [loading, setLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [userRating, setUserRating] = useState<number | null>(0);
+    const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
     const navigate = useNavigate();
 
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -41,10 +51,40 @@ const MovieDetail: React.FC = () => {
         setAccessToken(getAccessToken);
     }, [isAuthenticated, getAccessToken]);
 
-    const handleUserRating = (_event: React.SyntheticEvent, newValue: number | null) => {
-        setUserRating(newValue);
-        console.log(`User rated: ${newValue}`);
-        submitUserRating(newValue);
+    useEffect(() => {
+        if (accessToken) {
+            fetchUserRating();
+        }
+    }, [accessToken]);
+
+    const toggleReviewExpansion = (id: string) => {
+        setExpandedReviewIds((prevIds) =>
+            prevIds.includes(id)
+                ? prevIds.filter((reviewId) => reviewId !== id) // Ẩn review
+                : [...prevIds, id] // Hiển thị đầy đủ review
+        );
+    };
+
+    const fetchUserRating = async () => {
+        try {
+            const response = await axios.get(
+                `https://final-nest-back.vercel.app/user/rate/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
+            console.log("Diem", response.data);
+
+            if (response.data) {
+                setUserRating(response.data); // Lưu điểm đánh giá của user
+            } else {
+                setUserRating(null); // Nếu chưa đánh giá
+            }
+        } catch (error) {
+            console.error('Error fetching user rating:', error);
+        }
     };
 
     const submitUserRating = async (rating: number | null) => {
@@ -53,19 +93,40 @@ const MovieDetail: React.FC = () => {
                 console.log('Access token not found');
                 return;
             }
-
-            const response = await axios.post(`https://final-nest-back.vercel.app/user/${id}/rate`, { rating }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`
+    
+            const response = await axios.post(
+                `https://final-nest-back.vercel.app/user/rate/${id}`,
+                { rating },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
+                    },
                 }
-            });
+            );
 
-            console.log('Rating submitted successfully:', response);
+            console.log(response.data);
+    
+            if (response.data) {
+                const { vote_average, vote_count } = response.data;
+
+                console.log(vote_average, vote_count);
+    
+                // Cập nhật thông tin phim
+                setMovie((prevMovie) => ({
+                    ...prevMovie,
+                    vote_average,
+                    vote_count,
+                }));
+    
+                // Cập nhật điểm đánh giá của user
+                setUserRating(rating);
+            }
         } catch (error) {
             console.error('Error submitting rating:', error);
         }
     };
+    
 
     const handleAddToWatchlist = async () => {
         try {
@@ -183,29 +244,6 @@ const MovieDetail: React.FC = () => {
             console.error("Invalid cast ID");
         }
     }
-    const handleWatchList = async () => {
-        try {
-           
-            if (!accessToken) {
-                console.log('Access token not found');
-            }
-            console.log('Submitting watchlist with token:', accessToken);
-
-            const response = await axios.post(`http://localhost:3000/user/watchlist/${id}`,{},{
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`
-                }
-            })
-           
-            console.log('Rating submitted successfully:', response);
-        } catch (error) {
-            console.error('Error submitting rating:', error);
-        }
-    };
-    // Tính toán phần trăm từ rating
-    // const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
-    const displayedRating = movie.vote_average;
 
     const WatchlistIcon = () => (
         <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -222,11 +260,6 @@ const MovieDetail: React.FC = () => {
     return (
         <ThemeProvider theme={customTheme}>
             <div className="bg-gray-900 text-white min-h-screen">
-                <div className="h-[80px]">
-                    <button onClick={handleWatchList}>
-                        Watch List
-                    </button>
-                </div>
                 <div className="relative">
                     <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
                         {/* Bên trái: Ảnh poster */}
@@ -244,23 +277,23 @@ const MovieDetail: React.FC = () => {
 
                             <div className="flex items-center mt-4 mb-6">
                                 <div className="text-center mr-4">
-                                    <p className="text-4xl font-bold text-white">{displayedRating.toFixed(1)}</p>
+                                    <p className="text-4xl font-bold text-white">{movie.vote_average.toFixed(1)}</p>
                                     <p className="text-gray-400 text-sm">{movie.vote_count} votes</p>
                                 </div>
                                 <Rating
                                     name="movie-rating"
-                                    value={displayedRating}
+                                    value={movie.vote_average || 0}
                                     max={10}
                                     precision={0.1}
-                                    readOnly={!isLoggedIn || userRating === null}
-                                    onChange={handleUserRating}
+                                    onChange={(_event, value) => submitUserRating(value)}
                                     size="large"
                                 />
-                                <div className="text-center mr-4">
+                                <div className="text-center ml-4">
                                     <p className="text-gray-400 text-sm">Your rating</p>
-                                    <p className="text-4xl font-bold text-white">{userRating}</p>
+                                    <p className="text-4xl font-bold text-white">{userRating !== null ? userRating : '0'}</p>
                                 </div>
                             </div>
+
 
                             <div className="flex space-x-4 mt-4">
                                 {isLoggedIn && (
@@ -308,43 +341,61 @@ const MovieDetail: React.FC = () => {
                             <h2 className="text-2xl mt-6 font-bold text-white">Reviews</h2>
                             <div className="mt-4 space-y-4">
                                 {reviews.length > 0 ? (
-                                    reviews.map((review) => (
-                                        <div key={review.id} className="bg-gray-800 p-6 rounded-lg shadow-lg">
-                                            <div className="flex items-center mb-2">
-                                                {review.author_details.avatar_path ? (
-                                                    <img
-                                                        src={`https://image.tmdb.org/t/p/w64_and_h64_face${review.author_details.avatar_path}`}
-                                                        alt={`${review.author}'s avatar`}
-                                                        className="w-10 h-10 rounded-full mr-4"
-                                                    />
-                                                ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center mr-4">
-                                                        <span className="text-white text-sm">NA</span>
-                                                    </div>
-                                                )}
-                                                <div>
-                                                    <h3 className="text-lg font-bold text-yellow-400">
-                                                        {review.author || "Anonymous"}
-                                                    </h3>
-                                                    {review.author_details.rating !== null && (
-                                                        <p className="text-sm text-gray-400">
-                                                            Rating: {review.author_details.rating}/10
-                                                        </p>
+                                    reviews.map((review) => {
+                                        const isExpanded = expandedReviewIds.includes(review.id);
+                                        const contentToShow = isExpanded
+                                            ? review.content // Hiển thị đầy đủ nếu mở rộng
+                                            : review.content.length > 300
+                                            ? `${review.content.slice(0, 150)}...` // Cắt ngắn nếu quá dài
+                                            : review.content;
+
+                                        return (
+                                            <div key={review.id} className="bg-gray-800 p-6 rounded-lg shadow-lg">
+                                                <div className="flex items-center mb-2">
+                                                    {review.author_details.avatar_path ? (
+                                                        <img
+                                                            src={`https://image.tmdb.org/t/p/w64_and_h64_face${review.author_details.avatar_path}`}
+                                                            alt={`${review.author}'s avatar`}
+                                                            className="w-10 h-10 rounded-full mr-4"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center mr-4">
+                                                            <span className="text-white text-sm">NA</span>
+                                                        </div>
                                                     )}
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-yellow-400">
+                                                            {review.author || "Anonymous"}
+                                                        </h3>
+                                                        {review.author_details.rating !== null && (
+                                                            <p className="text-sm text-gray-400">
+                                                                Rating: {review.author_details.rating}/10
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
+                                                <p className="text-gray-300">{contentToShow}</p>
+                                                {review.content.length > 300 && (
+                                                    <button
+                                                        className="text-yellow-400 mt-2"
+                                                        onClick={() => toggleReviewExpansion(review.id)}
+                                                    >
+                                                        {isExpanded ? "Show Less" : "Show More"}
+                                                    </button>
+                                                )}
+                                                <p className="text-gray-500 text-sm mt-2">
+                                                    {new Date(review.created_at).toLocaleString()}
+                                                </p>
                                             </div>
-                                            <p className="text-gray-300">{review.content}</p>
-                                            <p className="text-gray-500 text-sm mt-2">
-                                                {new Date(review.created_at).toLocaleString()}
-                                            </p>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 ) : (
                                     <div className="bg-gray-800 p-6 rounded-lg text-center">
                                         <p className="text-gray-400">No reviews available for this movie.</p>
                                     </div>
                                 )}
                             </div>
+
                         </div>
                     </div>
                 </div>

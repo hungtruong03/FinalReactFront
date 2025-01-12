@@ -82,3 +82,11 @@
     color: #d4d4d4;
 }
 
+.text-yellow-400 {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.text-yellow-400:hover {
+    color: #ffd700;
+}
