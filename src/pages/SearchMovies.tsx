@@ -1,6 +1,7 @@
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 const SearchMovies: React.FC = () => {
     const [movies, setMovies] = useState<any[]>([]);
     const [page, setPage] = useState(1);
@@ -8,6 +9,10 @@ const SearchMovies: React.FC = () => {
     var { query } = useParams<{ query: string }>();
     var [que, setQuery] = useState(query);
     const [showFilters, setShowFilters] = useState<boolean>(false);
+    const location = useLocation();
+    const [timeframe, setTimeframe] = useState<"search" | "AI">(location.state);
+    const [loading, setLoading] = useState(true);
+
     const [formData, setFormData] = useState({
         minVoteAverage: 0,
         minVoteCount: 0,
@@ -20,8 +25,6 @@ const SearchMovies: React.FC = () => {
         page: '1',
     });
 
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -30,11 +33,13 @@ const SearchMovies: React.FC = () => {
         }));
     };
 
-
     const fetchCategoryData = async () => {
+        setLoading(true);
+
         try {
+            // alert(location.state)
             const queryObject = {
-                keyword: query || '',
+                keyword: que || '',
                 page: page.toString(),
                 minVoteAverage: formData.minVoteAverage?.toString() || '',
                 minVoteCount: formData.minVoteCount?.toString() || '',
@@ -46,27 +51,38 @@ const SearchMovies: React.FC = () => {
                 limit: formData.limit?.toString() || '',
             };
             console.log(queryObject);
-            // Gửi request với query object
-            const response = await axios.get('https://final-nest-back.vercel.app/movies/search', {
-                params: queryObject, // Sử dụng `params` để truyền query parameters
-            });
+            let response;
+            if (timeframe === "search") {
+                response = await axios.get('https://final-nest-back.vercel.app/movies/search', {
+                    params: queryObject,
+                });
+            } else {
+                response = await axios.get('https://final-nest-back.vercel.app/movies/searchAI', {
+                    params: queryObject,
+                });
+            }
+
             const data = await response.data;
             console.log(data)
             setMovies(data.movies || []);
-            setTotalPages(data.totalPages || 1); // Chắc chắn totalPages được sử dụng
+            setTotalPages(data.totalPages || 1);
+
+            setLoading(false);
         } catch (error) {
             console.error('Error fetching movies:', error);
+            setLoading(false);
+        } finally {
+            setLoading(false);
         }
     };
 
-
     useEffect(() => {
         fetchCategoryData();
-    }, [ page]);
+    }, [page, location.state]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-
+        // alert(timeframe);
         if (que) {
             setPage(1);
             query = que;
@@ -76,26 +92,47 @@ const SearchMovies: React.FC = () => {
             console.error("Error");
         }
     }
+    const handleSwitch = (option: "search" | "AI") => {
+        setTimeframe(option);
+    };
     return (
         <div className="bg-gray-900 text-white min-h-screen">
             <div className="h-[64px]">
             </div>
             <div className="container mx-auto p-6 relative">
-                <form onSubmit={handleSearch} className="mb-6">
-                    <input
-                        type="text"
-                        placeholder="Search for a movies"
-                        value={que||query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        className="p-3 ps-6 md:w-[70%] w-[30%] rounded-l-full text-gray-900 flex-grow focus:outline-none mt-4"
-                    />
-                    <button
-                        type="submit"
-                        className="ps-6 pe-6 p-3 bg-gradient-to-r from-pink-500 to-purple-900 hover:opacity-90 text-white rounded-r-full  font-semibold"
-                    >
-                        Search
-                    </button>
+                <form onSubmit={handleSearch} className="mb-6 relative">
+                    <div className="relative  ">
+                        <input
+                            type="text"
+                            placeholder="Search for a movies"
+                            value={que}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="p-4  w-full rounded-full text-gray-900 focus:outline-none"
+                        />
+                        <div className="absolute top-0 bottom-0 right-0 flex items-center justify-end  ">
+                            <div className="relative flex bg-gradient-to-r from-pink-500 to-purple-900 p-4 mt-4 mb-4 rounded-full w-[250px]">
+                                <div
+                                    className={`absolute inset-y-0 m-2 bg-pink-600 rounded-full transition-all ${timeframe === "search" ? "w-1/2 left-0 ml-2" : "w-1/2 left-1/2 -ml-2"}`}
+                                />
+                                <button
+                                    type="submit"
+                                    className={`relative  flex-1 text-white ${timeframe === "search" ? "font-bold" : ""}`}
+                                    onClick={() => { handleSwitch("search"); handleSearch }}
+                                >
+                                    Search
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={`relative  flex-1 text-white ${timeframe === "AI" ? "font-bold" : ""}`}
+                                    onClick={() => { handleSwitch("AI"); handleSearch }}
+                                >
+                                    AI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
+
 
 
                 <div className="flex items-center space-x-4">
@@ -204,44 +241,50 @@ const SearchMovies: React.FC = () => {
 
 
                 {/* Category Results */}
-                <div className="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {movies.map((item) => (
-                        <div
-                            key={item.id}
-                            className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
-                        >
-                            <Link to={`/movie/${item.id}`}>
-                                <img
-                                    src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`}
-                                    alt={item.title || item.name}
-                                    className="w-full h-64 object-cover"
-                                />
-                                <div className="p-4">
-                                    <h2 className="text-xl font-bold text-yellow-300">
-                                        {item.title || item.name}
-                                    </h2>
-                                    <h3 className="text-s  text-yellow-500">
-                                        {item.release_date &&
-                                            new Date(item.release_date).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric',
-                                            })
-                                        }
-                                    </h3>
+                {loading ? (
+                    <div className='flex justify-center'>
+                        <CircularProgress />
+                    </div>
+                ) : (
+                    <div className="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {movies.map((item) => (
+                            <div
+                                key={item.id}
+                                className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                            >
+                                <Link to={`/movie/${item.id}`}>
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`}
+                                        alt={item.title || item.name}
+                                        className="w-full h-64 object-cover"
+                                    />
+                                    <div className="p-4">
+                                        <h2 className="text-xl font-bold text-yellow-300">
+                                            {item.title || item.name}
+                                        </h2>
+                                        <h3 className="text-s  text-yellow-500">
+                                            {item.release_date &&
+                                                new Date(item.release_date).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                })
+                                            }
+                                        </h3>
 
-                                    {item.overview && (
-                                        <p className="text-sm text-gray-400">
-                                            {item.overview.length > 150
-                                                ? `${item.overview.substring(0, 150)}...`
-                                                : item.overview}
-                                        </p>
-                                    )}
-                                </div>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
+                                        {item.overview && (
+                                            <p className="text-sm text-gray-400">
+                                                {item.overview.length > 150
+                                                    ? `${item.overview.substring(0, 150)}...`
+                                                    : item.overview}
+                                            </p>
+                                        )}
+                                    </div>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Pagination */}

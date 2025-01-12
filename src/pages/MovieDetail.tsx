@@ -8,6 +8,7 @@ import Rating from '@mui/material/Rating';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { RootState } from '../store/store';
 import { useSelector } from 'react-redux';
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
 const customTheme = createTheme({
@@ -41,6 +42,7 @@ const MovieDetail: React.FC = () => {
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [userRating, setUserRating] = useState<number | null>(0);
     const [expandedReviewIds, setExpandedReviewIds] = useState<string[]>([]);
+    const [highlightCasts, setHighlightCasts] = useState(false);
     const navigate = useNavigate();
 
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -128,43 +130,44 @@ const MovieDetail: React.FC = () => {
     };
     
 
-    const handleAddToWatchlist = async () => {
-        try {
-            if (!accessToken) {
-                console.log('Access token not found');
-                return;
-            }
+    // const handleAddToWatchlist = async () => {
+    //     try {
+    //         if (!accessToken) {
+    //             console.log('Access token not found');
+    //             return;
+    //         }
 
-            const response = await axios.post(`https://final-nest-back.vercel.app/user/watchlist/${id}`, {}, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`
-                }
-            });
+    //         const response = await axios.post(`https://final-nest-back.vercel.app/user/watchlist/${id}`, {}, {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 Authorization: `Bearer ${accessToken}`
+    //             }
+    //         });
 
-            console.log('Movie added to watchlist:', response);
-        } catch (error) {
-            console.error('Error adding movie to watchlist:', error);
-        }
-    };
+    //         console.log('Movie added to watchlist:', response);
+    //     } catch (error) {
+    //         console.error('Error adding movie to watchlist:', error);
+    //     }
+    // };
 
     const handleAddToFavorites = async () => {
         try {
+
             if (!accessToken) {
                 console.log('Access token not found');
-                return;
             }
+            console.log('Submitting favourite with token:', accessToken);
 
-            const response = await axios.post(`https://final-nest-back.vercel.app/user/favorites/${id}`, {}, {
+            const response = await axios.post(`https://final-nest-back.vercel.app/user/favourite/${id}`, {}, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`
                 }
-            });
+            })
 
-            console.log('Movie added to favorites:', response);
+            console.log('favourite submitted successfully:', response);
         } catch (error) {
-            console.error('Error adding movie to favorites:', error);
+            console.error('Error submitting favourite:', error);
         }
     };
 
@@ -219,6 +222,19 @@ const MovieDetail: React.FC = () => {
                 setReviews(reviewsData); // Lưu danh sách reviews
 
                 setLoading(false);
+
+                setTimeout(() => {
+                    const hash = window.location.hash;
+                    if (hash === '#casts') {
+                        const element = document.getElementById('casts');
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+
+                            setHighlightCasts(true);
+                            setTimeout(() => setHighlightCasts(false), 2000); // Remove highlight after 2 seconds
+                        }
+                    }
+                }, 500);
             } catch (error) {
                 console.error('Error fetching movie details or credits:', error);
                 setLoading(false);
@@ -229,11 +245,11 @@ const MovieDetail: React.FC = () => {
     }, [id]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className='bg-gray-900 text-white flex justify-center'><CircularProgress className='mt-72 mb-72' /></div>;
     }
 
     if (!movie) {
-        return <div>Movie not found</div>;
+        return <div className='text-2xl mt-6 font-bold text-black text-center'>Movie not found</div>;
     }
 
     const handleGoToCastDetail = (castId: number) => {
@@ -244,22 +260,51 @@ const MovieDetail: React.FC = () => {
             console.error("Invalid cast ID");
         }
     }
+    const handleWatchList = async () => {
+        try {
+
+            if (!accessToken) {
+                console.log('Access token not found');
+            }
+            console.log('Submitting watchlist with token:', accessToken);
+
+            const response = await axios.post(`https://final-nest-back.vercel.app/user/watchlist/${id}`, {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
+
+            console.log('Rating submitted successfully:', response);
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+        }
+    };
+    // Tính toán phần trăm từ rating
+    // const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
+    const displayedRating = movie.vote_average;
 
     const WatchlistIcon = () => (
+        <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1S9.6 1.84 9.18 3H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-1 14h2v-6h-2v6z" />
+        </svg>
+    );
+
+    const FavoritesIcon = () => (
+
         <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
         </svg>
     );
-    
-    const FavoritesIcon = () => (
-        <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1S9.6 1.84 9.18 3H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-1 14h2v-6h-2v6z" />
-        </svg>
-    );    
 
     return (
         <ThemeProvider theme={customTheme}>
             <div className="bg-gray-900 text-white min-h-screen">
+                {/* <div className="h-[80px]">
+                    <button onClick={handleWatchList}>
+                        Watch List
+                    </button>
+                </div> */}
                 <div className="relative">
                     <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
                         {/* Bên trái: Ảnh poster */}
@@ -299,7 +344,7 @@ const MovieDetail: React.FC = () => {
                                 {isLoggedIn && (
                                     <>
                                         <button
-                                            onClick={handleAddToWatchlist}
+                                            onClick={handleWatchList}
                                             className="icon-button"
                                             aria-label="Add to Watchlist"
                                         >
@@ -322,8 +367,8 @@ const MovieDetail: React.FC = () => {
                             <h2 className="text-2xl mt-6 font-bold text-white">Overview</h2>
                             <p className="mt-3 text-lg text-gray-300">{movie.overview}</p>
 
-                            <h2 className="text-2xl mt-6 font-bold text-white">Casts</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4">
+                            <h2 id="casts" className="text-2xl mt-6 font-bold text-white">Casts</h2>
+                            <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-4 ${highlightCasts ? 'border-4 border-yellow-400' : ''}`}>
                                 {credits.slice(0, 10).map((actor) => (
                                     <div key={actor.id} className="text-center">
                                         <img
