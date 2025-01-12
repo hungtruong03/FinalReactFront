@@ -280,9 +280,6 @@ const MovieDetail: React.FC = () => {
             console.error('Error submitting rating:', error);
         }
     };
-    // Tính toán phần trăm từ rating
-    // const ratingPercentage = movie.vote_average * 10; // Chuyển đổi từ 0-10 sang 0-100
-    const displayedRating = movie.vote_average;
 
     const WatchlistIcon = () => (
         <svg className="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
