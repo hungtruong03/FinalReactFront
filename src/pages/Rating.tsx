@@ -133,16 +133,14 @@ const RatingList: React.FC = () => {
                                     <div className="text-center mr-4">
                                         <p className="text-4xl font-bold text-white">{item.vote_average.toFixed(1)}</p>
                                     </div>
-                                    <div>
-
+                                    <div className="w-full">
                                         <Rating
                                             name="movie-rating"
                                             value={item.vote_average || 0}
                                             max={10}
                                             precision={0.1}
-                                            className="d-flex"
                                             onChange={(_event, value) => submitUserRating(value, item.id)}
-                                            size="small"
+                                            style={{ fontSize: '100%' }}
                                         />
                                     </div>
                                 </div>
