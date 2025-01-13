@@ -314,6 +314,9 @@ function ResponsiveAppBar() {
                                 <MenuItem onClick={() => navigate('/favourite')}>
                                     <Typography textAlign="center">Favourite</Typography>
                                 </MenuItem>
+                                <MenuItem onClick={() => navigate('/rating')}>
+                                    <Typography textAlign="center">Rating </Typography>
+                                </MenuItem>
                                 <MenuItem onClick={() => navigate('/watchlist')}>
                                     <Typography textAlign="center">Watch List</Typography>
                                 </MenuItem>

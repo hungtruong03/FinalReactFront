@@ -13,6 +13,7 @@ import ResetPassword from "../pages/ResetPassword";
 import Favourite from "../pages/Favourite";
 import WatchList from "../pages/Watchlist";
 import Profile from "../pages/Profile";
+import RatingList from "../pages/Rating";
 export default function AppRouter() {
     return (
         <Router>
@@ -26,6 +27,7 @@ export default function AppRouter() {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/favourite" element={<Favourite />} />
                         <Route path="/watchlist" element={<WatchList />} />
+                        <Route path="/rating" element={<RatingList />} />
                     </Route>
                     <Route path="/movie/:id" element={<MovieDetail />} /> {/* Route cho MovieDetail */}
                     <Route path="/person/:castId" element={<CastDetail />} />
