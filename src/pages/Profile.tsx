@@ -5,7 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 
 const Home: React.FC = () => {
-    const [userData, setUserData] = useState<{ email: string; username: string } | null>(null);
+    const [userData, setUserData] = useState<{ email: string; username: string; isGoogleAccount: boolean } | null>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);
 
     const getAccessToken = useSelector((state: RootState) => state.auth.accessToken);
@@ -46,6 +46,11 @@ const Home: React.FC = () => {
                             <p>
                                 <span className="font-semibold">Email:</span> {userData.email}
                             </p>
+                            {userData.isGoogleAccount && (
+                                <p>
+                                    <span className="font-semibold">(Google Account)</span>
+                                </p>
+                            )}
                         </div>
                     ) : (
                         <CircularProgress />
