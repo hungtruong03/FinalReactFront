@@ -109,29 +109,30 @@ const RatingList: React.FC = () => {
                         <div className="p-4">
                             <div className="flex justify-between">
                                 <div>
-                                
-                            <h2 className="text-4xl font-bold text-yellow-300">
-                                {item.title || item.name}
-                            </h2>
-                            <h3 className="text-s  flex justify-between text-yellow-500">
-                                {item.release_date &&
-                                    new Date(item.release_date).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'short',
-                                        day: 'numeric',
-                                    })
-                                }
-                            </h3>
-                            </div>
-                            <div className="text-center ml-4">
-                                <p className="text-gray-400 text-sm mt-4">Your rating</p>
-                                <p className="text-3xl font-bold text-white">{item.userRating !== null ? item.userRating : '0'}</p>
-                            </div>
+
+                                    <h2 className="text-4xl font-bold text-yellow-300">
+                                        {item.title || item.name}
+                                    </h2>
+                                    <h3 className="text-s  flex justify-between text-yellow-500">
+                                        {item.release_date &&
+                                            new Date(item.release_date).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric',
+                                            })
+                                        }
+                                    </h3>
+                                    
+                                </div>
+                                <div className="text-center ml-4">
+                                    <p className="text-gray-400 text-sm mt-4">Your rating</p>
+                                    <p className="text-3xl font-bold text-white">{item.userRating !== null ? item.userRating : '0'}</p>
+                                </div>
                             </div>
                             <div className="d-flex items-center mt-4 mb-6">
                                 <div className="flex">
                                     <div className="text-center mr-4">
-                                        <p className="text-4xl font-bold text-white">{item.vote_average.toFixed(1)}</p>
+                                        <p className=" font-bold text-white">{item.vote_average.toFixed(1)}</p>
                                     </div>
                                     <div className="w-full">
                                         <Rating
