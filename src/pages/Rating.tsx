@@ -140,8 +140,9 @@ const RatingList: React.FC = () => {
                                             value={item.vote_average || 0}
                                             max={10}
                                             precision={0.1}
+                                            className="d-flex"
                                             onChange={(_event, value) => submitUserRating(value, item.id)}
-                                            size="large"
+                                            size="small"
                                         />
                                     </div>
                                 </div>
