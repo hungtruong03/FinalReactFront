@@ -95,20 +95,22 @@ const RatingList: React.FC = () => {
                     <div
                         key={item.id}
                         className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out" >
-                        <Link to={`/movie/${item.id}`}>
+                        <Link to={`/movie/${item.id}`} className="h-[200px]">
 
-                            <div className="relative">
-                                <img
-                                    src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`}
-                                    alt={item.title || item.name}
-                                    className="w-full object-cover"
-                                />
-                                <object data="" type=""></object>
-                            </div>
+                            <img
+                                src={`https://image.tmdb.org/t/p/w500${item.poster_path || item.profile_path}`}
+                                alt={item.title || item.name}
+                                className="w-full object-cover"
+                            />
+                            {/* <object data="" type=""></object> */}
+
                         </Link>
 
                         <div className="p-4">
-                            <h2 className="text-xl font-bold text-yellow-300">
+                            <div className="flex justify-between">
+                                <div>
+                                
+                            <h2 className="text-4xl font-bold text-yellow-300">
                                 {item.title || item.name}
                             </h2>
                             <h3 className="text-s  flex justify-between text-yellow-500">
@@ -119,26 +121,31 @@ const RatingList: React.FC = () => {
                                         day: 'numeric',
                                     })
                                 }
-
-
-
                             </h3>
-                            <div className="flex items-center mt-4 mb-6">
-                                <div className="text-center mr-4">
-                                    <p className="text-4xl font-bold text-white">{item.vote_average.toFixed(1)}</p>
+                            </div>
+                            <div className="text-center ml-4">
+                                <p className="text-gray-400 text-sm mt-4">Your rating</p>
+                                <p className="text-3xl font-bold text-white">{item.userRating !== null ? item.userRating : '0'}</p>
+                            </div>
+                            </div>
+                            <div className="d-flex items-center mt-4 mb-6">
+                                <div className="flex">
+                                    <div className="text-center mr-4">
+                                        <p className="text-4xl font-bold text-white">{item.vote_average.toFixed(1)}</p>
+                                    </div>
+                                    <div>
+
+                                        <Rating
+                                            name="movie-rating"
+                                            value={item.vote_average || 0}
+                                            max={10}
+                                            precision={0.1}
+                                            onChange={(_event, value) => submitUserRating(value, item.id)}
+                                            size="large"
+                                        />
+                                    </div>
                                 </div>
-                                <Rating
-                                    name="movie-rating"
-                                    value={item.vote_average || 0}
-                                    max={10}
-                                    precision={0.1}
-                                    onChange={(_event, value) => submitUserRating(value, item.id)}
-                                    size="large"
-                                />
-                                <div className="text-center ml-4">
-                                    <p className="text-gray-400 text-sm">Your rating</p>
-                                    <p className="text-4xl font-bold text-white">{item.userRating !== null ? item.userRating : '0'}</p>
-                                </div>
+
                             </div>
                             {item.overview && (
                                 <p className="text-sm text-gray-400">
