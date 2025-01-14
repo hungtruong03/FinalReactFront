@@ -301,7 +301,7 @@ const Home: React.FC = () => {
                     {trailersLoading ? (
                         <p className="text-black text-center">Loading...</p>
                     ) : (
-                        <div className="flex gap-4 overflow-x-auto">
+                        <div className="flex justify-center items-center gap-4 overflow-x-auto">
                             {trailers.map((trailer) => (
                                 <div
                                     key={trailer.id}

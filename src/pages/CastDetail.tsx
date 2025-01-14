@@ -10,6 +10,7 @@ const CastDetail: React.FC = () => {
     const [cast, setCast] = useState<any>(null);
     const [movies, setMovies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isBiographyExpanded, setIsBiographyExpanded] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -55,6 +56,16 @@ const CastDetail: React.FC = () => {
         }
     }
 
+    const toggleBiographyExpansion = () => {
+        setIsBiographyExpanded((prev) => !prev);
+    };
+
+    const biographyToShow = isBiographyExpanded
+        ? cast.biography
+        : cast.biography?.length > 500
+            ? `${cast.biography.slice(0, 500)}...`
+            : cast.biography;
+
     return (
         <>
             <div className="bg-gray-900 text-white min-h-screen">
@@ -81,9 +92,19 @@ const CastDetail: React.FC = () => {
                             <h1 className="text-4xl font-bold text-yellow-400 mb-3">{cast.name}</h1>
 
                             <h2 className="text-2xl mt-6 text-white">Biography</h2>
-                            <p className="mt-3 mb-3 text-lg text-gray-300">{cast.biography || "No biography"}</p>
+                            <p className="text-lg text-gray-300">
+                                {biographyToShow || "No biography"}
+                            </p>
+                            {cast.biography && cast.biography.length > 500 && (
+                                <button
+                                    className="text-yellow-400"
+                                    onClick={toggleBiographyExpansion}
+                                >
+                                    {isBiographyExpanded ? "Show Less" : "Show More"}
+                                </button>
+                            )}
 
-                            <p className="text-lg text-gray-400"><strong>Birthday:</strong> {format(new Date(cast.birthday), 'MMMM dd, yyyy') || "No information"} {cast.deathday ? `(Died: ${format(new Date(cast.deathday), 'MMMM dd, yyyy')})` : null}</p>
+                            <p className="text-lg text-gray-400 mt-3"><strong>Birthday:</strong> {format(new Date(cast.birthday), 'MMMM dd, yyyy') || "No information"} {cast.deathday ? `(Died: ${format(new Date(cast.deathday), 'MMMM dd, yyyy')})` : null}</p>
 
                             <p className="text-lg text-gray-400"><strong>Gender:</strong> {cast.gender === 1 ? "Female" : cast.gender === 2 ? "Male" : "Not specified"}</p>
 
