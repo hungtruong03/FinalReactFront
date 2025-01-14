@@ -419,7 +419,18 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                             <Button variant="outlined" onClick={() => setModalOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button variant="contained" onClick={handleConfirmOTP} disabled={loading}>
+                            <Button
+                                variant="contained"
+                                onClick={handleConfirmOTP}
+                                disabled={loading}
+                                sx={{
+                                    // bgcolor: loading ? 'grey.400' : 'inherit',
+                                    // color: loading ? 'white' : 'inherit',
+                                    '&.Mui-disabled': {
+                                        bgcolor: 'grey.300',
+                                        color: 'white',
+                                    },
+                                }}>
                                 Confirm
                             </Button>
                         </Box>

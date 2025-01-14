@@ -32,7 +32,6 @@ export default function AppRouter() {
                     <Route path="/movie/:id" element={<MovieDetail />} /> {/* Route cho MovieDetail */}
                     <Route path="/person/:castId" element={<CastDetail />} />
                     <Route path="/search/:query" element={<SearchMovies />} />
-
                     <Route path="/resetpassword" element={<ResetPassword />} />
                 </Routes>
             </MainLayout>

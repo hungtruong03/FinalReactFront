@@ -247,7 +247,7 @@ const MovieDetail: React.FC = () => {
     }
 
     if (!movie) {
-        return <div className='text-2xl mt-6 font-bold text-black text-center'>Movie not found</div>;
+        return <div className='text-2xl mt-6 font-bold text-black text-center mt-72 mb-72'>Movie not found</div>;
     }
 
     const handleGoToCastDetail = (castId: number) => {
