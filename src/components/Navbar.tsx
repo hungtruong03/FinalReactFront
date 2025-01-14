@@ -129,7 +129,7 @@ function ResponsiveAppBar() {
                     });
                     break;
             }
-            
+
             setNavLoading(false);
         } catch (error) {
             console.error('Error fetching navigation destination:', error);
@@ -258,25 +258,29 @@ function ResponsiveAppBar() {
                                                 color="primary"
                                                 onClick={handleSubmitNavigationSearch}
                                                 sx={{
-                                                    backgroundColor: '#4a00e0',
+                                                    backgroundColor: '#ec4899',
                                                     color: '#fff',
                                                     textTransform: 'none',
-                                                    padding: '3px 10px',
+                                                    padding: '2px 8px',
                                                     fontWeight: 'bold',
+                                                    fontSize: '0.8rem',
                                                     '&:hover': {
-                                                        backgroundColor: '#3700b3',
+                                                        backgroundColor: '#be185d',
                                                     },
                                                 }}
                                             >
-                                                {navLoading ? <CircularProgress size={20} /> : 'Go'}
+                                                {navLoading ? <CircularProgress size={16} /> : 'Go'}
                                             </Button>
                                         </InputAdornment>
                                     ),
                                 }}
                                 sx={{
-                                    backgroundColor: '#6a00ff',
-                                    borderRadius: '8px',
+                                    background: 'linear-gradient(to right, #ec4899, #6b21a8)',
+                                    borderRadius: '6px',
+                                    padding: '2px',
                                     '& .MuiOutlinedInput-root': {
+                                        height: '36px',
+                                        fontSize: '0.8rem',
                                         '& fieldset': {
                                             border: 'none',
                                         },
