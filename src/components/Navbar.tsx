@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
@@ -293,7 +293,7 @@ function ResponsiveAppBar() {
                         <Box sx={{ flexGrow: 0, ml: '20px' }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                                    <AccountCircleIcon sx={{ color: 'white', fontSize: '40px' }} />
                                 </IconButton>
                             </Tooltip>
                             <Menu
