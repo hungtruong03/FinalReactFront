@@ -10,6 +10,8 @@ import { RootState } from '../store/store';
 import { useSelector } from 'react-redux';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const customTheme = createTheme({
     components: {
@@ -126,32 +128,12 @@ const MovieDetail: React.FC = () => {
             console.error('Error submitting rating:', error);
         }
     };
-    
-
-    // const handleAddToWatchlist = async () => {
-    //     try {
-    //         if (!accessToken) {
-    //             console.log('Access token not found');
-    //             return;
-    //         }
-
-    //         const response = await axios.post(`https://final-nest-back.vercel.app/user/watchlist/${id}`, {}, {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 Authorization: `Bearer ${accessToken}`
-    //             }
-    //         });
-
-    //         console.log('Movie added to watchlist:', response);
-    //     } catch (error) {
-    //         console.error('Error adding movie to watchlist:', error);
-    //     }
-    // };
 
     const handleAddToFavorites = async () => {
         try {
 
             if (!accessToken) {
+                toast.error('Please log in to add favorites.');
                 console.log('Access token not found');
             }
             console.log('Submitting favourite with token:', accessToken);
@@ -162,9 +144,10 @@ const MovieDetail: React.FC = () => {
                     Authorization: `Bearer ${accessToken}`
                 }
             })
-
+            toast.success('Added to watch list successfully!');
             console.log('favourite submitted successfully:', response);
         } catch (error) {
+            toast.error('Error submitting favourtie!');
             console.error('Error submitting favourite:', error);
         }
     };
@@ -262,7 +245,7 @@ const MovieDetail: React.FC = () => {
         try {
 
             if (!accessToken) {
-                console.log('Access token not found');
+                toast.error('Please log in to add to watchlist.');
             }
             console.log('Submitting watchlist with token:', accessToken);
 
@@ -273,8 +256,11 @@ const MovieDetail: React.FC = () => {
                 }
             })
 
+            toast.success('Added to watch list successfully!');
+            
             console.log('Rating submitted successfully:', response);
         } catch (error) {
+            toast.error('Error submitting favourtie!');
             console.error('Error submitting rating:', error);
         }
     };
@@ -295,6 +281,7 @@ const MovieDetail: React.FC = () => {
     return (
         <ThemeProvider theme={customTheme}>
             <div className="bg-gray-900 text-white min-h-screen">
+                <ToastContainer />
                 {/* <div className="h-[80px]">
                     <button onClick={handleWatchList}>
                         Watch List
