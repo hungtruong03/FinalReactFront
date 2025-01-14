@@ -152,7 +152,7 @@ const RatingList: React.FC = () => {
                                     {item.overview.length > 150
                                         ? `${item.overview.substring(0, 150)}...`
                                         : item.overview}
-                                </p>
+                                </p>    
                             )}
                         </div>
                     </div>

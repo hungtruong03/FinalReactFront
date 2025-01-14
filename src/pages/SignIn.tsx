@@ -245,8 +245,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     };
 
     return (
-        <>
-            <AppTheme {...props}>
+        <div style={{
+            background: 'linear-gradient(45deg, #7e2e8f, #f7a7c1, #4a90e2)',
+          }}>
+            <AppTheme {...props} >
                 <CssBaseline enableColorScheme />
                 <SignInContainer direction="column" justifyContent="space-between">
                     {/* <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} /> */}
@@ -369,6 +371,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                     </Alert>
                 </Snackbar>
             </AppTheme>
-        </>
+        </div>
     );
 }
