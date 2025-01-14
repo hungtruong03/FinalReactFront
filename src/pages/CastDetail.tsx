@@ -43,7 +43,7 @@ const CastDetail: React.FC = () => {
     }
 
     if (!cast) {
-        return <div className='text-2xl mt-6 font-bold text-black text-center'>Cast not found</div>;
+        return <div className='text-2xl mt-6 font-bold text-black text-center mt-72 mb-72'>Cast not found</div>;
     }
 
     const handleGoToDetail = (id: number) => {
@@ -70,7 +70,7 @@ const CastDetail: React.FC = () => {
                         }}
                     />
                     <div className="container mx-auto p-6 flex flex-col md:flex-row relative z-10">
-                        <div className="md:w-1/2 mb-6 md:mb-0  flex justify-center items-center">
+                        <div className="md:w-1/2 mb-6 md:mb-0 flex justify-center items-start">
                             <img
                                 src={`https://image.tmdb.org/t/p/w500/${cast.profile_path}`}
                                 alt={cast.name}

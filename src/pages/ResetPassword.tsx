@@ -109,7 +109,7 @@ export default function ResetPassword(props: { disableCustomTheme?: boolean }) {
                             mt: 2,
                             '&.Mui-disabled': {
                                 bgcolor: 'grey.300',
-                                color: 'grey.300',
+                                color: 'white',
                             },
                         }}
                     >
