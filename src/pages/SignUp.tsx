@@ -173,12 +173,48 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                 setRegistrationPayload(payload);
                 setModalOpen(true);
             } else {
-                throw new Error('Failed to request OTP.');
+                setSnackbar({
+                    open: true,
+                    message: response.data.message,
+                    severity: 'error',
+                });
             }
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: 'Failed to send OTP. Please try again.',
+                severity: 'error',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResendOTP = async () => {
+        setLoading(true);
+
+        try {
+            const response = await axios.post('https://final-nest-back.vercel.app/user/requestOTP', {
+                email: registrationPayload?.email,
+            });
+
+            if (response.status === 200) {
+                setSnackbar({
+                    open: true,
+                    message: 'OTP resent successfully.',
+                    severity: 'success',
+                });
+            } else {
+                setSnackbar({
+                    open: true,
+                    message: response.data.message,
+                    severity: 'error',
+                });
+            }
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: 'Failed to resend OTP. Please try again.',
                 severity: 'error',
             });
         } finally {
@@ -279,7 +315,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     return (
         <div style={{
             background: 'linear-gradient(45deg, #7e2e8f, #f7a7c1, #4a90e2)',
-          }}>
+        }}>
             <AppTheme {...props}>
                 <CssBaseline enableColorScheme />
                 {/* <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} /> */}
@@ -417,6 +453,17 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
                                 },
                             }}
                         />
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                cursor: 'pointer',
+                                color: 'primary.main',
+                                '&:hover': { textDecoration: 'underline' },
+                            }}
+                            onClick={() => {handleResendOTP()}}
+                        >
+                            Resend OTP
+                        </Typography>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
                             <Button variant="outlined" onClick={() => setModalOpen(false)}>
                                 Cancel
