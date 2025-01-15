@@ -24,7 +24,7 @@ const Home: React.FC = () => {
     const [hoveredTrailer, setHoveredTrailer] = useState('');
     const [trailersLoading, setTrailersLoading] = useState(false);
     const [timeframe, setTimeframe] = useState<"day" | "week">("day");
-    const [AI,setAI] =useState<"search" | "AI">("search");
+    const [AI, setAI] = useState<"search" | "AI">("search");
     const [recommendedMovies, setRecommendedMovies] = useState<any[]>([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -47,7 +47,7 @@ const Home: React.FC = () => {
                     recommendationMode === "history"
                         ? "/user/recommendations"
                         : "/recommendation/vector";
-    
+
                 const response = await axios.get(`https://final-nest-back.vercel.app${endpoint}`, {
                     headers: {
                         Authorization: `Bearer ${accessToken}`, // Gửi token xác thực
@@ -59,17 +59,17 @@ const Home: React.FC = () => {
                 console.error("Error fetching recommendations:", error);
             }
         };
-    
+
         if (accessToken) {
             // Gọi lần đầu tiên ngay khi component mount
             fetchRecommendations();
-    
+
             // Thiết lập polling
             interval = setInterval(() => {
                 fetchRecommendations();
             }, 120000);
         }
-    
+
         // Dọn dẹp interval khi component unmount
         return () => {
             if (interval) {
@@ -147,7 +147,7 @@ const Home: React.FC = () => {
         e.preventDefault();
         if (query) {
             console.log(query);
-            navigate(`/search/${query}`,{state:AI});
+            navigate(`/search/${query}`, { state: AI });
         } else {
             console.error("Error");
         }
@@ -196,14 +196,14 @@ const Home: React.FC = () => {
                                     <button
                                         type="submit"
                                         className={`relative z-5 flex-1 text-white ${AI === "search" ? "font-bold" : ""}`}
-                                        onClick={() => {handleAI("search");handleSearch}}
+                                        onClick={() => { handleAI("search"); handleSearch }}
                                     >
                                         Search
                                     </button>
                                     <button
                                         type="submit"
                                         className={`relative z-5 flex-1 text-white ${AI === "AI" ? "font-bold" : ""}`}
-                                        onClick={() =>  {handleAI("AI");handleSearch}}
+                                        onClick={() => { handleAI("AI"); handleSearch }}
                                     >
                                         AI
                                     </button>
@@ -301,24 +301,24 @@ const Home: React.FC = () => {
                     {trailersLoading ? (
                         <p className="text-black text-center">Loading...</p>
                     ) : (
-                        <div className="flex justify-center items-center gap-4 overflow-x-auto">
+                        <div className="flex justify-start items-center gap-4 overflow-x-auto">
                             {trailers.map((trailer) => (
                                 <div
                                     key={trailer.id}
-                                    className="w-[350px] text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
+                                    className="w-[90%] sm:w-[350px] text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
                                     onMouseEnter={() => setHoveredTrailer(trailer.movie.backdrop_path)}
                                 >
                                     <div className="relative" onClick={() => openModal(trailer)}>
                                         <img
                                             src={`https://img.youtube.com/vi/${trailer.key}/0.jpg`}
                                             alt={trailer.name}
-                                            className="w-full h-[300px] rounded-md"
+                                            className="w-full h-[200px] sm:h-[300px] rounded-md object-cover"
                                         />
                                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md">
-                                            <FontAwesomeIcon className='w-10 h-10' icon={faPlay} />
+                                            <FontAwesomeIcon className="w-10 h-10" icon={faPlay} />
                                         </div>
                                     </div>
-                                    <h3 className="font-bold text-white text-center text-sm mt-2" onClick={() => handleGoToDetail(trailer.movie.id)}>{trailer.movie.title}</h3>
+                                    <h3 className="font-bold text-white text-center text-sm mt-2 line-clamp-2">{trailer.movie.title}</h3>
                                     <h4 className="font-semibold text-white text-center text-sm mt-2">{format(new Date(trailer.movie.release_date), 'MMM dd, yyyy')}</h4>
                                 </div>
                             ))}
@@ -331,17 +331,17 @@ const Home: React.FC = () => {
                     <Modal
                         isOpen={!!selectedTrailer}
                         onRequestClose={closeModal}
-                        className="bg-gray-900 p-4 max-w-6xl mx-auto my-20 rounded-lg"
+                        className="bg-gray-900 p-4 mx-auto my-20 rounded-lg max-w-6xl w-[90%] md:w-[80%] lg:w-[60%]"
                         overlayClassName="bg-black bg-opacity-75 fixed inset-0 flex items-center justify-center"
                     >
-                        <div>
+                        <div className="flex flex-col items-center">
                             <iframe
                                 src={`https://www.youtube.com/embed/${selectedTrailer.key}`}
                                 title={selectedTrailer.name}
-                                className="w-[800px] h-[500px] rounded-md"
+                                className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] rounded-md"
                                 allowFullScreen
                             />
-                            <h3 className="font-bold text-center text-xl mt-4 text-white">
+                            <h3 className="font-bold text-center text-lg md:text-xl mt-4 text-white">
                                 {selectedTrailer.movie.title}
                             </h3>
                         </div>
@@ -410,22 +410,19 @@ const Home: React.FC = () => {
                             <h2 className="text-2xl font-bold text-black mb-4 mt-4">Recommended for You</h2>
                             <div className="relative flex bg-gray-800 p-2 rounded-full w-80 ml-4">
                                 <div
-                                    className={`absolute h-3/5 bg-gray-700 rounded-full transition-all ${
-                                        recommendationMode === "history" ? "w-1/2 left-0 ml-2" : "w-1/2 left-1/2 -ml-2"
-                                    }`}
+                                    className={`absolute h-3/5 bg-gray-700 rounded-full transition-all ${recommendationMode === "history" ? "w-1/2 left-0 ml-2" : "w-1/2 left-1/2 -ml-2"
+                                        }`}
                                 />
                                 <button
-                                    className={`relative z-5 flex-1 text-white ${
-                                        recommendationMode === "history" ? "font-bold" : ""
-                                    }`}
+                                    className={`relative z-5 flex-1 text-white ${recommendationMode === "history" ? "font-bold" : ""
+                                        }`}
                                     onClick={() => setRecommendationMode("history")}
                                 >
                                     User History
                                 </button>
                                 <button
-                                    className={`relative z-5 flex-1 text-white ${
-                                        recommendationMode === "vector" ? "font-bold" : ""
-                                    }`}
+                                    className={`relative z-5 flex-1 text-white ${recommendationMode === "vector" ? "font-bold" : ""
+                                        }`}
                                     onClick={() => setRecommendationMode("vector")}
                                 >
                                     Vector Search
@@ -445,42 +442,43 @@ const Home: React.FC = () => {
                                         return '#e74c3c'; // Red
                                     };
                                     return (
-                                    <div
-                                        key={movie.id}
-                                        className="w-[200px] bg-gray-800 text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
-                                        onClick={() => handleGoToDetail(movie.id)}
-                                    >
-                                        <div className="relative">
-                                            <img
-                                                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                                                alt={movie.title}
-                                                className="rounded-md w-[180px] h-[200px] object-cover mb-4 mx-auto"
-                                            />
-                                            <div className="absolute -top-2 -left-2 w-10 h-10 bg-[#2d2d2d] rounded-full">
-                                            <CircularProgressbar
-                                                value={movie.vote_count === 0 ? 0 : ratingPercentage}
-                                                text={movie.vote_count === 0 ? "NR" : `${ratingPercentage.toString()}%`}
-                                                strokeWidth={12}
-                                                styles={buildStyles({
-                                                    pathColor: getColor(),
-                                                    backgroundColor: "#2d2d2d",
-                                                    trailColor: '#444',
-                                                    textColor: '#fff',
-                                                    textSize: '32px',
-                                                })}
-                                            />
+                                        <div
+                                            key={movie.id}
+                                            className="w-[200px] bg-gray-800 text-white p-4 rounded-lg flex-shrink-0 relative cursor-pointer"
+                                            onClick={() => handleGoToDetail(movie.id)}
+                                        >
+                                            <div className="relative">
+                                                <img
+                                                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                                                    alt={movie.title}
+                                                    className="rounded-md w-[180px] h-[200px] object-cover mb-4 mx-auto"
+                                                />
+                                                <div className="absolute -top-2 -left-2 w-10 h-10 bg-[#2d2d2d] rounded-full">
+                                                    <CircularProgressbar
+                                                        value={movie.vote_count === 0 ? 0 : ratingPercentage}
+                                                        text={movie.vote_count === 0 ? "NR" : `${ratingPercentage.toString()}%`}
+                                                        strokeWidth={12}
+                                                        styles={buildStyles({
+                                                            pathColor: getColor(),
+                                                            backgroundColor: "#2d2d2d",
+                                                            trailColor: '#444',
+                                                            textColor: '#fff',
+                                                            textSize: '32px',
+                                                        })}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <h3 className="font-bold text-center text-sm break-words line-clamp-2" title={movie.title}>
+                                                    {movie.title}
+                                                </h3>
+                                                <p className="text-xs italic text-center">
+                                                    {movie.release_date ? format(new Date(movie.release_date), 'MMM dd, yyyy') : 'Unknown'}
+                                                </p>
+                                            </div>
                                         </div>
-                                        </div>
-                                        <div className="flex flex-col items-center">
-                                            <h3 className="font-bold text-center text-sm break-words line-clamp-2" title={movie.title}>
-                                                {movie.title}
-                                            </h3>
-                                            <p className="text-xs italic text-center">
-                                                {movie.release_date ? format(new Date(movie.release_date), 'MMM dd, yyyy') : 'Unknown'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )})}
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
